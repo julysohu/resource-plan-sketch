@@ -16,14 +16,6 @@ interface ProcessStep {
   aiEfficiency: 'higher' | 'lower' | '';
 }
 
-interface ResourcePlan {
-  id: string;
-  type: string;
-  current: string;
-  gap: string;
-  plan: string;
-}
-
 interface Solution {
   id: string;
   title: string;
@@ -37,14 +29,12 @@ interface Scenario {
   afterProcess: string;
 }
 
-interface InvestmentItem {
+interface ResourcePlan {
   id: string;
-  category: string;
-  item: string;
-  quantity: string;
-  unitCost: string;
-  totalCost: string;
-  description: string;
+  type: string;
+  current: string;
+  gap: string;
+  plan: string;
 }
 
 const NewReport = () => {
@@ -57,8 +47,7 @@ const NewReport = () => {
       completed: '',
       uncompleted: '',
       painPoints: ''
-    },
-    flowchartDescription: ''
+    }
   });
 
   const [processSteps, setProcessSteps] = useState<ProcessStep[]>([
@@ -76,12 +65,6 @@ const NewReport = () => {
   const [resourcePlans, setResourcePlans] = useState<ResourcePlan[]>([
     { id: '1', type: '', current: '', gap: '', plan: '' }
   ]);
-
-  const [investmentItems, setInvestmentItems] = useState<InvestmentItem[]>([
-    { id: '1', category: '', item: '', quantity: '', unitCost: '', totalCost: '', description: '' }
-  ]);
-
-  const [investmentOutput, setInvestmentOutput] = useState('');
 
   const addProcessStep = () => {
     const newStep: ProcessStep = {
@@ -172,41 +155,6 @@ const NewReport = () => {
     ));
   };
 
-  const addInvestmentItem = () => {
-    const newItem: InvestmentItem = {
-      id: Date.now().toString(),
-      category: '',
-      item: '',
-      quantity: '',
-      unitCost: '',
-      totalCost: '',
-      description: ''
-    };
-    setInvestmentItems([...investmentItems, newItem]);
-  };
-
-  const removeInvestmentItem = (id: string) => {
-    if (investmentItems.length > 1) {
-      setInvestmentItems(investmentItems.filter(item => item.id !== id));
-    }
-  };
-
-  const updateInvestmentItem = (id: string, field: keyof InvestmentItem, value: string) => {
-    setInvestmentItems(investmentItems.map(item => {
-      if (item.id === id) {
-        const updatedItem = { ...item, [field]: value };
-        // 自动计算总成本
-        if (field === 'quantity' || field === 'unitCost') {
-          const quantity = parseFloat(field === 'quantity' ? value : updatedItem.quantity) || 0;
-          const unitCost = parseFloat(field === 'unitCost' ? value : updatedItem.unitCost) || 0;
-          updatedItem.totalCost = (quantity * unitCost).toString();
-        }
-        return updatedItem;
-      }
-      return item;
-    }));
-  };
-
   const handleSave = () => {
     toast({
       title: "保存成功",
@@ -275,72 +223,66 @@ const NewReport = () => {
           </CardContent>
         </Card>
 
-        {/* 二、现状分析 */}
+        {/* 二、现状分析 - 修改为1行3列 */}
         <Card className="border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
             <CardTitle className="text-xl">二、现状分析</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 space-y-6">
-            <div>
-              <Label htmlFor="completed" className="text-sm font-medium text-gray-700">已经做到的部分</Label>
-              <Textarea
-                id="completed"
-                placeholder="描述当前已经完成的工作内容..."
-                value={reportData.currentAnalysis.completed}
-                onChange={(e) => setReportData({
-                  ...reportData,
-                  currentAnalysis: { ...reportData.currentAnalysis, completed: e.target.value }
-                })}
-                className="mt-2 min-h-[100px]"
-              />
-            </div>
-            <div>
-              <Label htmlFor="uncompleted" className="text-sm font-medium text-gray-700">尚未做到的部分</Label>
-              <Textarea
-                id="uncompleted"
-                placeholder="描述还未完成的工作内容..."
-                value={reportData.currentAnalysis.uncompleted}
-                onChange={(e) => setReportData({
-                  ...reportData,
-                  currentAnalysis: { ...reportData.currentAnalysis, uncompleted: e.target.value }
-                })}
-                className="mt-2 min-h-[100px]"
-              />
-            </div>
-            <div>
-              <Label htmlFor="painPoints" className="text-sm font-medium text-gray-700">尚未做到部分的痛点</Label>
-              <Textarea
-                id="painPoints"
-                placeholder="分析存在的问题和痛点..."
-                value={reportData.currentAnalysis.painPoints}
-                onChange={(e) => setReportData({
-                  ...reportData,
-                  currentAnalysis: { ...reportData.currentAnalysis, painPoints: e.target.value }
-                })}
-                className="mt-2 min-h-[100px]"
-              />
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <Label htmlFor="completed" className="text-sm font-medium text-gray-700">已经做到的部分</Label>
+                <Textarea
+                  id="completed"
+                  placeholder="描述当前已经完成的工作内容..."
+                  value={reportData.currentAnalysis.completed}
+                  onChange={(e) => setReportData({
+                    ...reportData,
+                    currentAnalysis: { ...reportData.currentAnalysis, completed: e.target.value }
+                  })}
+                  className="mt-2 min-h-[120px]"
+                />
+              </div>
+              <div>
+                <Label htmlFor="uncompleted" className="text-sm font-medium text-gray-700">尚未做到的部分</Label>
+                <Textarea
+                  id="uncompleted"
+                  placeholder="描述还未完成的工作内容..."
+                  value={reportData.currentAnalysis.uncompleted}
+                  onChange={(e) => setReportData({
+                    ...reportData,
+                    currentAnalysis: { ...reportData.currentAnalysis, uncompleted: e.target.value }
+                  })}
+                  className="mt-2 min-h-[120px]"
+                />
+              </div>
+              <div>
+                <Label htmlFor="painPoints" className="text-sm font-medium text-gray-700">尚未做到部分的痛点</Label>
+                <Textarea
+                  id="painPoints"
+                  placeholder="分析存在的问题和痛点..."
+                  value={reportData.currentAnalysis.painPoints}
+                  onChange={(e) => setReportData({
+                    ...reportData,
+                    currentAnalysis: { ...reportData.currentAnalysis, painPoints: e.target.value }
+                  })}
+                  className="mt-2 min-h-[120px]"
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* 三、调研流程图 */}
+        {/* 三、调研流程图 - 基于流程表生成 */}
         <Card className="border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
             <CardTitle className="text-xl">三、调研流程图</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            <Label htmlFor="flowchart" className="text-sm font-medium text-gray-700">流程图描述</Label>
-            <Textarea
-              id="flowchart"
-              placeholder="描述调研流程，可用于AI生成流程图或手动插入流程图..."
-              value={reportData.flowchartDescription}
-              onChange={(e) => setReportData({ ...reportData, flowchartDescription: e.target.value })}
-              className="mt-2 min-h-[120px]"
-            />
-            <div className="mt-4 p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+            <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
               <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-              <p>流程图展示区域</p>
-              <p className="text-sm">可插入流程图或根据描述AI生成</p>
+              <p>基于下方流程表内容AI生成流程图</p>
+              <p className="text-sm">填写完流程表后将自动生成可视化流程图</p>
             </div>
           </CardContent>
         </Card>
@@ -594,113 +536,6 @@ const NewReport = () => {
                   </div>
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 八、投入产出清单 */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
-            <CardTitle className="flex items-center justify-between text-xl">
-              八、投入产出清单
-              <Button onClick={addInvestmentItem} size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
-                <Plus className="w-4 h-4 mr-1" />
-                添加项目
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              {investmentItems.map((item, index) => (
-                <div key={item.id} className="p-4 border rounded-lg bg-gray-50">
-                  <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-end">
-                    <div>
-                      <Label className="text-sm font-medium text-gray-700">类别</Label>
-                      <select
-                        value={item.category}
-                        onChange={(e) => updateInvestmentItem(item.id, 'category', e.target.value)}
-                        className="mt-1 w-full p-2 border border-gray-300 rounded-md text-sm"
-                      >
-                        <option value="">请选择</option>
-                        <option value="人力成本">人力成本</option>
-                        <option value="设备费用">设备费用</option>
-                        <option value="软件费用">软件费用</option>
-                        <option value="培训费用">培训费用</option>
-                        <option value="其他费用">其他费用</option>
-                      </select>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium text-gray-700">项目</Label>
-                      <Input
-                        value={item.item}
-                        onChange={(e) => updateInvestmentItem(item.id, 'item', e.target.value)}
-                        placeholder="具体项目"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium text-gray-700">数量</Label>
-                      <Input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => updateInvestmentItem(item.id, 'quantity', e.target.value)}
-                        placeholder="数量"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium text-gray-700">单价</Label>
-                      <Input
-                        type="number"
-                        value={item.unitCost}
-                        onChange={(e) => updateInvestmentItem(item.id, 'unitCost', e.target.value)}
-                        placeholder="单价"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium text-gray-700">总成本</Label>
-                      <Input
-                        value={item.totalCost}
-                        onChange={(e) => updateInvestmentItem(item.id, 'totalCost', e.target.value)}
-                        placeholder="总成本"
-                        className="mt-1"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium text-gray-700">说明</Label>
-                      <Input
-                        value={item.description}
-                        onChange={(e) => updateInvestmentItem(item.id, 'description', e.target.value)}
-                        placeholder="备注说明"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Button
-                        onClick={() => removeInvestmentItem(item.id)}
-                        variant="outline"
-                        size="sm"
-                        className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                        disabled={investmentItems.length === 1}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              
-              {/* 总计 */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-medium text-gray-900">总投入成本:</span>
-                  <span className="text-xl font-bold text-blue-600">
-                    ¥{investmentItems.reduce((total, item) => total + (parseFloat(item.totalCost) || 0), 0).toFixed(2)}
-                  </span>
-                </div>
-              </div>
             </div>
           </CardContent>
         </Card>
