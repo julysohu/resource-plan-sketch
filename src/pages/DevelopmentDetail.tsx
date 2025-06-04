@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Plus, Trash2, CheckCircle, Clock, AlertCircle, DollarSign, Target, Trophy } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, CheckCircle, Clock, AlertCircle, DollarSign, Target, Trophy, Map } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import TopNavigation from '@/components/TopNavigation';
@@ -261,16 +261,26 @@ const DevelopmentDetail = () => {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Header */}
-        <div className="flex items-center space-x-4 mb-8">
-          <Link to="/development">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              返回开发管理
-            </Button>
-          </Link>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-4">
+            <Link to="/development">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                返回开发管理
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">{requirement.title}</h1>
+              <p className="text-sm text-gray-600">{requirement.description}</p>
+            </div>
+          </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">{requirement.title}</h1>
-            <p className="text-sm text-gray-600">{requirement.description}</p>
+            <Link to={`/roadmap/${id}`}>
+              <Button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800">
+                <Map className="w-4 h-4 mr-2" />
+                查看Roadmap
+              </Button>
+            </Link>
           </div>
         </div>
 

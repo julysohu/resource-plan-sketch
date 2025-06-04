@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,16 +33,12 @@ const RequirementDetail = () => {
       {
         sequence: 1,
         step: "用户注册",
-        description: "新用户注册流程",
-        beforeProcess: "手动审核注册申请，效率低下",
-        afterProcess: "自动化审核流程，快速完成注册"
+        description: "新用户注册流程"
       },
       {
         sequence: 2,
         step: "权限分配",
-        description: "用户权限管理",
-        beforeProcess: "管理员手动分配权限，容易出错",
-        afterProcess: "基于角色的自动权限分配"
+        description: "用户权限管理"
       }
     ],
     solutions: [
@@ -286,30 +281,20 @@ const RequirementDetail = () => {
                 <div className="space-y-4">
                   {requirement.scenarioSteps.map((step, index) => (
                     <div key={index} className="p-4 border rounded bg-gray-50">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="text-sm"><strong>场景:</strong> {step.step}</div>
                         <div className="text-sm"><strong>描述:</strong> {step.description}</div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h5 className="text-sm font-medium text-gray-700 mb-1">解决前流程</h5>
-                          <p className="text-sm text-gray-600">{step.beforeProcess}</p>
-                        </div>
-                        <div>
-                          <h5 className="text-sm font-medium text-gray-700 mb-1">解决后流程</h5>
-                          <p className="text-sm text-gray-600">{step.afterProcess}</p>
-                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
               
-              {/* AI生成场景对比图 */}
+              {/* AI生成场景流程图 */}
               <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
                 <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                <p className="font-medium">AI生成的场景流程对比图</p>
-                <p className="text-sm">基于场景流程表生成的解决前后对比图</p>
+                <p className="font-medium">AI生成的场景流程图</p>
+                <p className="text-sm">基于场景流程表生成的解决后场景流程图</p>
               </div>
             </CardContent>
           </Card>

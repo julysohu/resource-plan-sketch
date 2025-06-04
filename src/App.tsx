@@ -11,6 +11,7 @@ import DevelopmentDetail from "./pages/DevelopmentDetail";
 import Requirements from "./pages/Requirements";
 import RequirementDetail from "./pages/RequirementDetail";
 import Dashboard from "./pages/Dashboard";
+import Roadmap from "./pages/Roadmap";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/requirements/:id" element={<RequirementDetail />} />
           <Route path="/development" element={<Development />} />
           <Route path="/development/:id" element={<DevelopmentDetail />} />
+          <Route path="/roadmap/:id" element={<Roadmap />} />
           <Route path="/dashboard" element={<Dashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
