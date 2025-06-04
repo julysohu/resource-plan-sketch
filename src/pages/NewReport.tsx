@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,6 +37,16 @@ interface Scenario {
   afterProcess: string;
 }
 
+interface InvestmentItem {
+  id: string;
+  category: string;
+  item: string;
+  quantity: string;
+  unitCost: string;
+  totalCost: string;
+  description: string;
+}
+
 const NewReport = () => {
   const { toast } = useToast();
   
@@ -66,6 +75,10 @@ const NewReport = () => {
 
   const [resourcePlans, setResourcePlans] = useState<ResourcePlan[]>([
     { id: '1', type: '', current: '', gap: '', plan: '' }
+  ]);
+
+  const [investmentItems, setInvestmentItems] = useState<InvestmentItem[]>([
+    { id: '1', category: '', item: '', quantity: '', unitCost: '', totalCost: '', description: '' }
   ]);
 
   const [investmentOutput, setInvestmentOutput] = useState('');
@@ -159,10 +172,45 @@ const NewReport = () => {
     ));
   };
 
+  const addInvestmentItem = () => {
+    const newItem: InvestmentItem = {
+      id: Date.now().toString(),
+      category: '',
+      item: '',
+      quantity: '',
+      unitCost: '',
+      totalCost: '',
+      description: ''
+    };
+    setInvestmentItems([...investmentItems, newItem]);
+  };
+
+  const removeInvestmentItem = (id: string) => {
+    if (investmentItems.length > 1) {
+      setInvestmentItems(investmentItems.filter(item => item.id !== id));
+    }
+  };
+
+  const updateInvestmentItem = (id: string, field: keyof InvestmentItem, value: string) => {
+    setInvestmentItems(investmentItems.map(item => {
+      if (item.id === id) {
+        const updatedItem = { ...item, [field]: value };
+        // 自动计算总成本
+        if (field === 'quantity' || field === 'unitCost') {
+          const quantity = parseFloat(field === 'quantity' ? value : updatedItem.quantity) || 0;
+          const unitCost = parseFloat(field === 'unitCost' ? value : updatedItem.unitCost) || 0;
+          updatedItem.totalCost = (quantity * unitCost).toString();
+        }
+        return updatedItem;
+      }
+      return item;
+    }));
+  };
+
   const handleSave = () => {
     toast({
       title: "保存成功",
-      description: "需求调研报告已保存",
+      description: "需求调研报告已保存并转换为需求",
     });
   };
 
@@ -553,17 +601,107 @@ const NewReport = () => {
         {/* 八、投入产出清单 */}
         <Card className="border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
-            <CardTitle className="text-xl">八、投入产出清单</CardTitle>
+            <CardTitle className="flex items-center justify-between text-xl">
+              八、投入产出清单
+              <Button onClick={addInvestmentItem} size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
+                <Plus className="w-4 h-4 mr-1" />
+                添加项目
+              </Button>
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            <Label htmlFor="investment" className="text-sm font-medium text-gray-700">投入产出分析</Label>
-            <Textarea
-              id="investment"
-              placeholder="详细列出项目投入成本、预期产出、ROI分析等..."
-              value={investmentOutput}
-              onChange={(e) => setInvestmentOutput(e.target.value)}
-              className="mt-2 min-h-[150px]"
-            />
+            <div className="space-y-4">
+              {investmentItems.map((item, index) => (
+                <div key={item.id} className="p-4 border rounded-lg bg-gray-50">
+                  <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-end">
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">类别</Label>
+                      <select
+                        value={item.category}
+                        onChange={(e) => updateInvestmentItem(item.id, 'category', e.target.value)}
+                        className="mt-1 w-full p-2 border border-gray-300 rounded-md text-sm"
+                      >
+                        <option value="">请选择</option>
+                        <option value="人力成本">人力成本</option>
+                        <option value="设备费用">设备费用</option>
+                        <option value="软件费用">软件费用</option>
+                        <option value="培训费用">培训费用</option>
+                        <option value="其他费用">其他费用</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">项目</Label>
+                      <Input
+                        value={item.item}
+                        onChange={(e) => updateInvestmentItem(item.id, 'item', e.target.value)}
+                        placeholder="具体项目"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">数量</Label>
+                      <Input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) => updateInvestmentItem(item.id, 'quantity', e.target.value)}
+                        placeholder="数量"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">单价</Label>
+                      <Input
+                        type="number"
+                        value={item.unitCost}
+                        onChange={(e) => updateInvestmentItem(item.id, 'unitCost', e.target.value)}
+                        placeholder="单价"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">总成本</Label>
+                      <Input
+                        value={item.totalCost}
+                        onChange={(e) => updateInvestmentItem(item.id, 'totalCost', e.target.value)}
+                        placeholder="总成本"
+                        className="mt-1"
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">说明</Label>
+                      <Input
+                        value={item.description}
+                        onChange={(e) => updateInvestmentItem(item.id, 'description', e.target.value)}
+                        placeholder="备注说明"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Button
+                        onClick={() => removeInvestmentItem(item.id)}
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                        disabled={investmentItems.length === 1}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {/* 总计 */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-medium text-gray-900">总投入成本:</span>
+                  <span className="text-xl font-bold text-blue-600">
+                    ¥{investmentItems.reduce((total, item) => total + (parseFloat(item.totalCost) || 0), 0).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
