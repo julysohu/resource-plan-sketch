@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, History, Save, X } from "lucide-react";
+import { ArrowLeft, Edit, History, Save, X, TrendingUp } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import TopNavigation from '@/components/TopNavigation';
 import { Textarea } from "@/components/ui/textarea";
@@ -15,31 +15,45 @@ const RequirementDetail = () => {
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [assetLoss, setAssetLoss] = useState('');
 
-  // 模拟需求数据
+  // 模拟完整需求数据
   const requirement = {
     id: 1,
     title: "用户管理系统需求",
-    background: "随着业务发展，需要构建完整的用户管理体系...",
+    background: "随着业务发展，需要构建完整的用户管理体系，包括用户注册、登录、权限管理等功能。当前系统缺乏统一的用户管理机制，存在安全隐患和管理效率问题。",
     currentAnalysis: {
-      completed: "已完成基础用户注册功能",
-      uncompleted: "权限管理、用户分组等功能尚未实现",
-      painPoints: "现有系统权限控制粒度不够细"
+      completed: "已完成基础用户注册功能，实现了基本的用户信息录入和存储",
+      uncompleted: "权限管理、用户分组、角色管理等功能尚未实现",
+      painPoints: "现有系统权限控制粒度不够细，用户管理分散，缺乏统一的权限控制机制"
     },
     processSteps: [
       { sequence: 1, step: "需求调研", description: "与业务方沟通确认需求", aiEfficiency: "higher" },
-      { sequence: 2, step: "系统设计", description: "设计用户管理架构", aiEfficiency: "lower" }
+      { sequence: 2, step: "系统设计", description: "设计用户管理架构", aiEfficiency: "lower" },
+      { sequence: 3, step: "开发实施", description: "编码实现各功能模块", aiEfficiency: "higher" }
     ],
-    scenarios: [
+    scenarioSteps: [
       {
-        title: "用户注册场景",
-        beforeProcess: "手动审核注册申请",
-        afterProcess: "自动化审核流程"
+        sequence: 1,
+        step: "用户注册",
+        description: "新用户注册流程",
+        beforeProcess: "手动审核注册申请，效率低下",
+        afterProcess: "自动化审核流程，快速完成注册"
+      },
+      {
+        sequence: 2,
+        step: "权限分配",
+        description: "用户权限管理",
+        beforeProcess: "管理员手动分配权限，容易出错",
+        afterProcess: "基于角色的自动权限分配"
       }
     ],
     solutions: [
       {
-        title: "方案1",
-        content: "基于RBAC模型构建权限管理系统..."
+        title: "方案1：基于RBAC的权限管理",
+        content: "采用基于角色的访问控制模型，实现灵活的权限管理。包括用户-角色-权限三层架构，支持动态权限配置。"
+      },
+      {
+        title: "方案2：微服务架构用户中心",
+        content: "构建独立的用户管理微服务，提供统一的用户认证和授权服务，支持多应用集成。"
       }
     ],
     resourcePlans: [
@@ -48,6 +62,12 @@ const RequirementDetail = () => {
         current: "2名开发人员",
         gap: "需要1名高级开发",
         plan: "招聘或内部调配"
+      },
+      {
+        type: "技术资源",
+        current: "基础开发环境",
+        gap: "缺少测试环境",
+        plan: "采购测试服务器"
       }
     ],
     version: "v1.2",
@@ -63,7 +83,6 @@ const RequirementDetail = () => {
   ];
 
   const handleSaveEdit = () => {
-    // 这里处理保存逻辑，包括资产损耗记录
     setIsEditing(false);
     setAssetLoss('');
   };
@@ -219,19 +238,133 @@ const RequirementDetail = () => {
             </CardContent>
           </Card>
 
-          {/* 其他章节按相同模式展示 */}
+          {/* 三、现状流程调研建模 */}
           <Card className="border-0 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
-              <CardTitle>三、调研流程图</CardTitle>
+              <CardTitle>三、现状流程调研建模</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
+              {/* 流程表 */}
+              <div className="mb-6">
+                <h4 className="font-medium text-gray-900 mb-4">调研流程表</h4>
+                <div className="space-y-2">
+                  {requirement.processSteps.map((step, index) => (
+                    <div key={index} className="grid grid-cols-5 gap-4 p-3 border rounded bg-gray-50">
+                      <div className="text-sm font-medium">{step.sequence}</div>
+                      <div className="text-sm">{step.step}</div>
+                      <div className="text-sm col-span-2">{step.description}</div>
+                      <div className="text-sm">
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          step.aiEfficiency === 'higher' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+                        }`}>
+                          {step.aiEfficiency === 'higher' ? 'AI效能更高' : 'AI效能较低'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* AI生成流程图 */}
               <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
-                <p>基于流程表生成的AI流程图</p>
+                <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                <p className="font-medium">AI生成的现状流程图</p>
+                <p className="text-sm">基于流程表内容生成的可视化流程图</p>
               </div>
             </CardContent>
           </Card>
 
-          {/* 继续展示其他章节... */}
+          {/* 四、解决后的应用场景流程建模 */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+              <CardTitle>四、解决后的应用场景流程建模</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              {/* 场景流程表 */}
+              <div className="mb-6">
+                <h4 className="font-medium text-gray-900 mb-4">场景流程表</h4>
+                <div className="space-y-4">
+                  {requirement.scenarioSteps.map((step, index) => (
+                    <div key={index} className="p-4 border rounded bg-gray-50">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                        <div className="text-sm"><strong>场景:</strong> {step.step}</div>
+                        <div className="text-sm"><strong>描述:</strong> {step.description}</div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-700 mb-1">解决前流程</h5>
+                          <p className="text-sm text-gray-600">{step.beforeProcess}</p>
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-700 mb-1">解决后流程</h5>
+                          <p className="text-sm text-gray-600">{step.afterProcess}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* AI生成场景对比图 */}
+              <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+                <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                <p className="font-medium">AI生成的场景流程对比图</p>
+                <p className="text-sm">基于场景流程表生成的解决前后对比图</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 五、解决方案描述 */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+              <CardTitle>五、解决方案描述</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-6">
+                {requirement.solutions.map((solution, index) => (
+                  <div key={index}>
+                    <h4 className="font-medium text-gray-900 mb-3">{solution.title}</h4>
+                    {isEditing ? (
+                      <Textarea value={solution.content} className="min-h-[120px]" />
+                    ) : (
+                      <p className="text-gray-700">{solution.content}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 六、资源稀缺以及投入计划阐述 */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+              <CardTitle>六、资源稀缺以及投入计划阐述</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {requirement.resourcePlans.map((plan, index) => (
+                  <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded bg-gray-50">
+                    <div>
+                      <h5 className="text-sm font-medium text-gray-700">资源类型</h5>
+                      <p className="text-sm text-gray-600">{plan.type}</p>
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-medium text-gray-700">现有资源情况</h5>
+                      <p className="text-sm text-gray-600">{plan.current}</p>
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-medium text-gray-700">需求缺口</h5>
+                      <p className="text-sm text-gray-600">{plan.gap}</p>
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-medium text-gray-700">投入计划</h5>
+                      <p className="text-sm text-gray-600">{plan.plan}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>

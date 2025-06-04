@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Save, Plus, Trash2, FileText, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import TopNavigation from '@/components/TopNavigation';
 
 interface ProcessStep {
   id: string;
@@ -16,17 +18,19 @@ interface ProcessStep {
   aiEfficiency: 'higher' | 'lower' | '';
 }
 
+interface ScenarioStep {
+  id: string;
+  sequence: number;
+  step: string;
+  description: string;
+  beforeProcess: string;
+  afterProcess: string;
+}
+
 interface Solution {
   id: string;
   title: string;
   content: string;
-}
-
-interface Scenario {
-  id: string;
-  title: string;
-  beforeProcess: string;
-  afterProcess: string;
 }
 
 interface ResourcePlan {
@@ -54,8 +58,8 @@ const NewReport = () => {
     { id: '1', sequence: 1, step: '', description: '', aiEfficiency: '' }
   ]);
 
-  const [scenarios, setScenarios] = useState<Scenario[]>([
-    { id: '1', title: '', beforeProcess: '', afterProcess: '' }
+  const [scenarioSteps, setScenarioSteps] = useState<ScenarioStep[]>([
+    { id: '1', sequence: 1, step: '', description: '', beforeProcess: '', afterProcess: '' }
   ]);
 
   const [solutions, setSolutions] = useState<Solution[]>([
@@ -66,6 +70,7 @@ const NewReport = () => {
     { id: '1', type: '', current: '', gap: '', plan: '' }
   ]);
 
+  // Process Steps handlers
   const addProcessStep = () => {
     const newStep: ProcessStep = {
       id: Date.now().toString(),
@@ -89,28 +94,32 @@ const NewReport = () => {
     ));
   };
 
-  const addScenario = () => {
-    const newScenario: Scenario = {
+  // Scenario Steps handlers
+  const addScenarioStep = () => {
+    const newStep: ScenarioStep = {
       id: Date.now().toString(),
-      title: '',
+      sequence: scenarioSteps.length + 1,
+      step: '',
+      description: '',
       beforeProcess: '',
       afterProcess: ''
     };
-    setScenarios([...scenarios, newScenario]);
+    setScenarioSteps([...scenarioSteps, newStep]);
   };
 
-  const removeScenario = (id: string) => {
-    if (scenarios.length > 1) {
-      setScenarios(scenarios.filter(scenario => scenario.id !== id));
+  const removeScenarioStep = (id: string) => {
+    if (scenarioSteps.length > 1) {
+      setScenarioSteps(scenarioSteps.filter(step => step.id !== id));
     }
   };
 
-  const updateScenario = (id: string, field: keyof Scenario, value: string) => {
-    setScenarios(scenarios.map(scenario => 
-      scenario.id === id ? { ...scenario, [field]: value } : scenario
+  const updateScenarioStep = (id: string, field: keyof ScenarioStep, value: string | number) => {
+    setScenarioSteps(scenarioSteps.map(step => 
+      step.id === id ? { ...step, [field]: value } : step
     ));
   };
 
+  // Solution handlers
   const addSolution = () => {
     const newSolution: Solution = {
       id: Date.now().toString(),
@@ -132,6 +141,7 @@ const NewReport = () => {
     ));
   };
 
+  // Resource Plan handlers
   const addResourcePlan = () => {
     const newPlan: ResourcePlan = {
       id: Date.now().toString(),
@@ -164,29 +174,7 @@ const NewReport = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link to="/">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  返回
-                </Button>
-              </Link>
-              <div className="flex items-center space-x-3">
-                <FileText className="w-6 h-6 text-blue-600" />
-                <h1 className="text-xl font-bold text-gray-900">新建需求调研报告</h1>
-              </div>
-            </div>
-            <Button onClick={handleSave} className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800">
-              <Save className="w-4 h-4 mr-2" />
-              保存报告
-            </Button>
-          </div>
-        </div>
-      </header>
+      <TopNavigation />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* 报告标题 */}
@@ -212,10 +200,21 @@ const NewReport = () => {
             <CardTitle className="text-xl">一、背景</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="font-medium text-blue-800 mb-2">📋 背景描述框架模板</h4>
+              <div className="text-sm text-blue-700 space-y-1">
+                <p><strong>建议包含：</strong></p>
+                <p>• 业务背景：当前业务发展阶段、面临的挑战</p>
+                <p>• 技术背景：现有技术架构、系统现状</p>
+                <p>• 用户背景：目标用户群体、使用场景</p>
+                <p>• 问题背景：亟需解决的核心问题</p>
+                <p>• 目标背景：期望达成的业务目标</p>
+              </div>
+            </div>
             <Label htmlFor="background" className="text-sm font-medium text-gray-700">背景描述</Label>
             <Textarea
               id="background"
-              placeholder="请填写项目背景描述..."
+              placeholder="请参考上方模板框架填写项目背景描述..."
               value={reportData.background}
               onChange={(e) => setReportData({ ...reportData, background: e.target.value })}
               className="mt-2 min-h-[120px]"
@@ -223,7 +222,7 @@ const NewReport = () => {
           </CardContent>
         </Card>
 
-        {/* 二、现状分析 - 修改为1行3列 */}
+        {/* 二、现状分析 */}
         <Card className="border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
             <CardTitle className="text-xl">二、现状分析</CardTitle>
@@ -273,25 +272,11 @@ const NewReport = () => {
           </CardContent>
         </Card>
 
-        {/* 三、调研流程图 - 基于流程表生成 */}
-        <Card className="border-0 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
-            <CardTitle className="text-xl">三、调研流程图</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
-              <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-              <p>基于下方流程表内容AI生成流程图</p>
-              <p className="text-sm">填写完流程表后将自动生成可视化流程图</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 四、调研流程表 */}
+        {/* 三、现状流程调研建模 */}
         <Card className="border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
             <CardTitle className="flex items-center justify-between text-xl">
-              四、调研流程表
+              三、现状流程调研建模
               <Button onClick={addProcessStep} size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
                 <Plus className="w-4 h-4 mr-1" />
                 添加步骤
@@ -299,7 +284,7 @@ const NewReport = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="space-y-4">
+            <div className="space-y-4 mb-6">
               {processSteps.map((step, index) => (
                 <div key={step.id} className="p-4 border rounded-lg bg-gray-50">
                   <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
@@ -357,78 +342,107 @@ const NewReport = () => {
                 </div>
               ))}
             </div>
+            
+            {/* AI生成流程图区域 */}
+            <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+              <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+              <p className="font-medium">AI生成的现状流程图</p>
+              <p className="text-sm">基于上方流程表内容自动生成可视化流程图</p>
+            </div>
           </CardContent>
         </Card>
 
-        {/* 五、解决后的应用场景建模对比 */}
+        {/* 四、解决后的应用场景流程建模 */}
         <Card className="border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
             <CardTitle className="flex items-center justify-between text-xl">
-              五、解决后的应用场景建模对比
-              <Button onClick={addScenario} size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
+              四、解决后的应用场景流程建模
+              <Button onClick={addScenarioStep} size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
                 <Plus className="w-4 h-4 mr-1" />
-                添加场景
+                添加场景步骤
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="space-y-6">
-              {scenarios.map((scenario, index) => (
-                <div key={scenario.id} className="p-4 border rounded-lg bg-gray-50">
-                  <div className="flex items-center justify-between mb-4">
-                    <Label className="text-lg font-medium text-gray-900">场景 {index + 1}</Label>
-                    <Button
-                      onClick={() => removeScenario(scenario.id)}
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                      disabled={scenarios.length === 1}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="space-y-4">
+            <div className="space-y-4 mb-6">
+              {scenarioSteps.map((step, index) => (
+                <div key={step.id} className="p-4 border rounded-lg bg-gray-50">
+                  <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-end">
                     <div>
-                      <Label className="text-sm font-medium text-gray-700">场景标题</Label>
+                      <Label className="text-sm font-medium text-gray-700">序号</Label>
                       <Input
-                        value={scenario.title}
-                        onChange={(e) => updateScenario(scenario.id, 'title', e.target.value)}
-                        placeholder="场景名称"
+                        type="number"
+                        value={step.sequence}
+                        onChange={(e) => updateScenarioStep(step.id, 'sequence', parseInt(e.target.value) || 0)}
                         className="mt-1"
                       />
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700">交付前流程</Label>
-                        <Textarea
-                          value={scenario.beforeProcess}
-                          onChange={(e) => updateScenario(scenario.id, 'beforeProcess', e.target.value)}
-                          placeholder="描述解决方案实施前的流程..."
-                          className="mt-1 min-h-[100px]"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700">交付后流程</Label>
-                        <Textarea
-                          value={scenario.afterProcess}
-                          onChange={(e) => updateScenario(scenario.id, 'afterProcess', e.target.value)}
-                          placeholder="描述解决方案实施后的流程..."
-                          className="mt-1 min-h-[100px]"
-                        />
-                      </div>
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">场景步骤</Label>
+                      <Input
+                        value={step.step}
+                        onChange={(e) => updateScenarioStep(step.id, 'step', e.target.value)}
+                        placeholder="场景步骤名称"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700">步骤描述</Label>
+                      <Input
+                        value={step.description}
+                        onChange={(e) => updateScenarioStep(step.id, 'description', e.target.value)}
+                        placeholder="详细描述"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label className="text-sm font-medium text-gray-700">解决前流程</Label>
+                      <Textarea
+                        value={step.beforeProcess}
+                        onChange={(e) => updateScenarioStep(step.id, 'beforeProcess', e.target.value)}
+                        placeholder="解决方案实施前的流程..."
+                        className="mt-1 min-h-[60px]"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label className="text-sm font-medium text-gray-700">解决后流程</Label>
+                      <Textarea
+                        value={step.afterProcess}
+                        onChange={(e) => updateScenarioStep(step.id, 'afterProcess', e.target.value)}
+                        placeholder="解决方案实施后的流程..."
+                        className="mt-1 min-h-[60px]"
+                      />
+                    </div>
+                    <div>
+                      <Button
+                        onClick={() => removeScenarioStep(step.id)}
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                        disabled={scenarioSteps.length === 1}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
+            
+            {/* AI生成场景流程图区域 */}
+            <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+              <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+              <p className="font-medium">AI生成的场景流程对比图</p>
+              <p className="text-sm">基于上方场景流程表内容自动生成解决前后流程对比图</p>
+            </div>
           </CardContent>
         </Card>
 
-        {/* 六、解决方案描述 */}
+        {/* 五、解决方案描述 */}
         <Card className="border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
             <CardTitle className="flex items-center justify-between text-xl">
-              六、解决方案描述
+              五、解决方案描述
               <Button onClick={addSolution} size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
                 <Plus className="w-4 h-4 mr-1" />
                 添加方案
@@ -470,11 +484,11 @@ const NewReport = () => {
           </CardContent>
         </Card>
 
-        {/* 七、资源稀缺以及投入计划阐述 */}
+        {/* 六、资源稀缺以及投入计划阐述 */}
         <Card className="border-0 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
             <CardTitle className="flex items-center justify-between text-xl">
-              七、资源稀缺以及投入计划阐述
+              六、资源稀缺以及投入计划阐述
               <Button onClick={addResourcePlan} size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
                 <Plus className="w-4 h-4 mr-1" />
                 添加资源
