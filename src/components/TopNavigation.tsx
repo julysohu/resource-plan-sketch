@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, Users, PieChart } from 'lucide-react';
+import { FileText, Users, PieChart, Building, User } from 'lucide-react';
 
 const TopNavigation = () => {
   const location = useLocation();
@@ -9,7 +9,8 @@ const TopNavigation = () => {
   const navItems = [
     { path: '/requirements', label: '需求管理', icon: FileText },
     { path: '/development', label: '开发管理', icon: Users },
-    { path: '/dashboard', label: '部门看板', icon: PieChart },
+    { path: '/department', label: '部门管理', icon: Building },
+    { path: '/personal', label: '个人管理', icon: User },
   ];
 
   return (

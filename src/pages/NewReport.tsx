@@ -1,90 +1,45 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Plus, Trash2, Save, TrendingUp } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Save, TrendingUp, Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 import TopNavigation from '@/components/TopNavigation';
 
-interface ProcessStep {
-  sequence: number;
-  step: string;
-  description: string;
-  aiEfficiency: 'higher' | 'lower';
-}
-
-interface ScenarioStep {
-  sequence: number;
-  step: string;
-  description: string;
-}
-
-interface Solution {
-  title: string;
-  content: string;
-}
-
-interface ResourcePlan {
-  type: string;
-  current: string;
-  gap: string;
-  plan: string;
-}
-
 const NewReport = () => {
-  const { toast } = useToast();
-
-  const [title, setTitle] = useState('');
-  const [background, setBackground] = useState('');
-  const [completed, setCompleted] = useState('');
-  const [uncompleted, setUncompleted] = useState('');
-  const [painPoints, setPainPoints] = useState('');
-  const [processSteps, setProcessSteps] = useState<ProcessStep[]>([
-    { sequence: 1, step: '', description: '', aiEfficiency: 'higher' }
+  const [processSteps, setProcessSteps] = useState([
+    { sequence: 1, step: '接收投放需求', description: '市场部门提出电商投放图制作需求，包含产品信息、投放平台、目标人群等' },
+    { sequence: 2, step: '素材收集', description: '设计师手动收集产品图片、品牌素材、文案内容等设计元素' },
+    { sequence: 3, step: '设计制作', description: '使用Photoshop等工具进行投放图设计，包括构图、配色、文字排版等' },
+    { sequence: 4, step: '内容审核', description: '设计总监对设计稿进行审核，检查品牌规范、视觉效果等' },
+    { sequence: 5, step: '修改完善', description: '根据审核意见进行设计调整和优化' },
+    { sequence: 6, step: '最终交付', description: '输出不同尺寸规格的投放图，交付给市场部门使用' }
   ]);
 
   const [scenarioSteps, setScenarioSteps] = useState([
-    { sequence: 1, step: '', description: '' }
-  ]);
-
-  const [solutions, setSolutions] = useState([
-    { title: '', content: '' }
-  ]);
-  const [resourcePlans, setResourcePlans] = useState([
-    { type: '', current: '', gap: '', plan: '' }
+    { sequence: 1, step: '智能需求分析', description: 'AI系统自动分析投放需求，提取关键信息和设计要求' },
+    { sequence: 2, step: '自动素材匹配', description: '从素材库中智能匹配合适的产品图、背景、装饰元素' },
+    { sequence: 3, step: 'AI辅助设计', description: '基于品牌规范和最佳实践，AI生成多个设计方案供选择' },
+    { sequence: 4, step: '快速预览调整', description: '设计师可实时预览效果，通过简单操作进行样式调整' },
+    { sequence: 5, step: '一键批量输出', description: '自动生成各平台所需的不同尺寸规格，确保质量一致性' }
   ]);
 
   const addProcessStep = () => {
     setProcessSteps([...processSteps, { 
       sequence: processSteps.length + 1, 
       step: '', 
-      description: '', 
-      aiEfficiency: 'higher' 
+      description: '' 
     }]);
   };
 
   const removeProcessStep = (index: number) => {
-    if (processSteps.length > 1) {
-      const newSteps = processSteps.filter((_, i) => i !== index);
-      const resequencedSteps = newSteps.map((step, i) => ({ ...step, sequence: i + 1 }));
-      setProcessSteps(resequencedSteps);
-    }
-  };
-
-  const updateProcessStep = (index: number, field: string, value: string) => {
-    const newSteps = [...processSteps];
-    newSteps[index] = { ...newSteps[index], [field]: value };
-    setProcessSteps(newSteps);
-  };
-
-  const updateProcessStepAiEfficiency = (index: number, value: 'higher' | 'lower') => {
-    const newSteps = [...processSteps];
-    newSteps[index] = { ...newSteps[index], aiEfficiency: value };
-    setProcessSteps(newSteps);
+    const newSteps = processSteps.filter((_, i) => i !== index);
+    // 重新排序
+    const reorderedSteps = newSteps.map((step, i) => ({ ...step, sequence: i + 1 }));
+    setProcessSteps(reorderedSteps);
   };
 
   const addScenarioStep = () => {
@@ -96,92 +51,17 @@ const NewReport = () => {
   };
 
   const removeScenarioStep = (index: number) => {
-    if (scenarioSteps.length > 1) {
-      const newSteps = scenarioSteps.filter((_, i) => i !== index);
-      const resequencedSteps = newSteps.map((step, i) => ({ ...step, sequence: i + 1 }));
-      setScenarioSteps(resequencedSteps);
-    }
-  };
-
-  const updateScenarioStep = (index: number, field: string, value: string) => {
-    const newSteps = [...scenarioSteps];
-    newSteps[index] = { ...newSteps[index], [field]: value };
-    setScenarioSteps(newSteps);
-  };
-
-  const addSolution = () => {
-    setSolutions([...solutions, { title: '', content: '' }]);
-  };
-
-  const removeSolution = (index: number) => {
-    if (solutions.length > 1) {
-      const newSolutions = solutions.filter((_, i) => i !== index);
-      setSolutions(newSolutions);
-    }
-  };
-
-  const updateSolution = (index: number, field: string, value: string) => {
-    const newSolutions = [...solutions];
-    newSolutions[index] = { ...newSolutions[index], [field]: value };
-    setSolutions(newSolutions);
-  };
-
-  const addResourcePlan = () => {
-    setResourcePlans([...resourcePlans, { type: '', current: '', gap: '', plan: '' }]);
-  };
-
-  const removeResourcePlan = (index: number) => {
-    if (resourcePlans.length > 1) {
-      const newPlans = resourcePlans.filter((_, i) => i !== index);
-      setResourcePlans(newPlans);
-    }
-  };
-
-  const updateResourcePlan = (index: number, field: string, value: string) => {
-    const newPlans = [...resourcePlans];
-    newPlans[index] = { ...newPlans[index], [field]: value };
-    setResourcePlans(newPlans);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!title || !background) {
-      toast({
-        title: "错误",
-        description: "请填写需求标题和背景",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Here you would typically send the data to your backend
-    const reportData = {
-      title,
-      background,
-      currentAnalysis: {
-        completed,
-        uncompleted,
-        painPoints
-      },
-      processSteps,
-      scenarioSteps,
-      solutions,
-      resourcePlans
-    };
-
-    console.log(reportData);
-    toast({
-      title: "成功",
-      description: "需求报告已提交",
-    });
+    const newSteps = scenarioSteps.filter((_, i) => i !== index);
+    // 重新排序
+    const reorderedSteps = newSteps.map((step, i) => ({ ...step, sequence: i + 1 }));
+    setScenarioSteps(reorderedSteps);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <TopNavigation />
       
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
@@ -192,49 +72,37 @@ const NewReport = () => {
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">新建需求报告</h1>
-              <p className="text-gray-600">填写需求报告，创建新的需求资产</p>
+              <h1 className="text-2xl font-bold text-gray-900">新建需求调研</h1>
+              <p className="text-gray-600">创建新的需求调研文档</p>
             </div>
           </div>
-          <Button type="submit" form="reportForm" className="bg-gradient-to-r from-blue-600 to-indigo-600">
+          
+          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600">
             <Save className="w-4 h-4 mr-2" />
-            提交
+            保存需求
           </Button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="space-y-8">
           {/* 一、背景 */}
           <Card className="border-0 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
               <CardTitle>一、背景</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">
-                    需求标题
-                  </Label>
-                  <Input
-                    id="title"
-                    placeholder="请输入需求标题"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="background" className="text-sm font-medium text-gray-700">
-                    项目背景
-                  </Label>
-                  <Textarea
-                    id="background"
-                    placeholder="请填写项目背景描述..."
-                    value={background}
-                    onChange={(e) => setBackground(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
+              <div className="mb-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                <h4 className="font-medium text-blue-900 mb-2">背景描述框架建议：</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• <strong>业务现状：</strong>描述当前业务场景和工作方式</li>
+                  <li>• <strong>遇到的问题：</strong>明确具体的痛点和挑战</li>
+                  <li>• <strong>业务影响：</strong>说明问题对业务效率和结果的影响</li>
+                  <li>• <strong>解决必要性：</strong>阐述为什么需要解决这个问题</li>
+                </ul>
               </div>
+              <Textarea
+                placeholder="请按照上述框架描述项目背景，例如：随着电商业务快速发展，我们需要大量的投放图片内容..."
+                className="min-h-[120px]"
+              />
             </CardContent>
           </Card>
 
@@ -246,40 +114,16 @@ const NewReport = () => {
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <Label htmlFor="completed" className="text-sm font-medium text-gray-700">
-                    已经做到的部分
-                  </Label>
-                  <Textarea
-                    id="completed"
-                    placeholder="请描述已经完成的部分..."
-                    value={completed}
-                    onChange={(e) => setCompleted(e.target.value)}
-                    className="mt-1"
-                  />
+                  <Label className="text-base font-medium text-gray-900 mb-3 block">已经做到的部分</Label>
+                  <Textarea placeholder="描述当前已经实现的功能和流程..." className="min-h-[120px]" />
                 </div>
                 <div>
-                  <Label htmlFor="uncompleted" className="text-sm font-medium text-gray-700">
-                    尚未做到的部分
-                  </Label>
-                  <Textarea
-                    id="uncompleted"
-                    placeholder="请描述尚未完成的部分..."
-                    value={uncompleted}
-                    onChange={(e) => setUncompleted(e.target.value)}
-                    className="mt-1"
-                  />
+                  <Label className="text-base font-medium text-gray-900 mb-3 block">尚未做到的部分</Label>
+                  <Textarea placeholder="描述还未实现的功能和需求..." className="min-h-[120px]" />
                 </div>
                 <div>
-                  <Label htmlFor="painPoints" className="text-sm font-medium text-gray-700">
-                    尚未做到部分的痛点
-                  </Label>
-                  <Textarea
-                    id="painPoints"
-                    placeholder="请描述尚未完成部分的痛点..."
-                    value={painPoints}
-                    onChange={(e) => setPainPoints(e.target.value)}
-                    className="mt-1"
-                  />
+                  <Label className="text-base font-medium text-gray-900 mb-3 block">尚未做到部分的痛点</Label>
+                  <Textarea placeholder="详细说明痛点和影响..." className="min-h-[120px]" />
                 </div>
               </div>
             </CardContent>
@@ -294,62 +138,54 @@ const NewReport = () => {
               {/* 流程表 */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-medium text-gray-900">调研流程表</h4>
-                  <Button 
-                    type="button" 
-                    onClick={addProcessStep}
-                    variant="outline" 
-                    size="sm"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
+                  <h4 className="font-medium text-gray-900">现状业务流程表</h4>
+                  <Button onClick={addProcessStep} variant="outline" size="sm">
+                    <Plus className="w-4 h-4 mr-1" />
                     添加步骤
                   </Button>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-12 gap-4 p-3 bg-gray-100 rounded font-medium text-sm">
+                    <div className="col-span-1">序号</div>
+                    <div className="col-span-3">流程步骤</div>
+                    <div className="col-span-7">步骤描述</div>
+                    <div className="col-span-1">操作</div>
+                  </div>
                   {processSteps.map((step, index) => (
-                    <div key={index} className="grid grid-cols-12 gap-4 p-4 border rounded bg-gray-50">
-                      <div className="col-span-1">
-                        <Label className="text-sm font-medium text-gray-700">序号</Label>
-                        <div className="mt-1 text-sm text-gray-600">{step.sequence}</div>
+                    <div key={index} className="grid grid-cols-12 gap-4 p-3 border rounded">
+                      <div className="col-span-1 flex items-center">
+                        <span className="text-sm font-medium">{step.sequence}</span>
                       </div>
                       <div className="col-span-3">
-                        <Label className="text-sm font-medium text-gray-700">流程步骤</Label>
-                        <Input
+                        <Input 
                           value={step.step}
-                          onChange={(e) => updateProcessStep(index, 'step', e.target.value)}
-                          placeholder="请输入流程步骤"
-                          className="mt-1"
+                          onChange={(e) => {
+                            const newSteps = [...processSteps];
+                            newSteps[index].step = e.target.value;
+                            setProcessSteps(newSteps);
+                          }}
+                          placeholder="步骤名称"
+                          className="text-sm"
                         />
                       </div>
-                      <div className="col-span-5">
-                        <Label className="text-sm font-medium text-gray-700">步骤描述</Label>
-                        <Input
+                      <div className="col-span-7">
+                        <Textarea 
                           value={step.description}
-                          onChange={(e) => updateProcessStep(index, 'description', e.target.value)}
-                          placeholder="请输入步骤描述"
-                          className="mt-1"
+                          onChange={(e) => {
+                            const newSteps = [...processSteps];
+                            newSteps[index].description = e.target.value;
+                            setProcessSteps(newSteps);
+                          }}
+                          placeholder="详细描述该步骤的具体内容和操作"
+                          className="text-sm min-h-[60px]"
                         />
                       </div>
-                      <div className="col-span-2">
-                        <Label className="text-sm font-medium text-gray-700">AI效能</Label>
-                        <Select onValueChange={(value) => updateProcessStepAiEfficiency(index, value as 'higher' | 'lower')}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="选择效能" defaultValue={step.aiEfficiency} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="higher">更高</SelectItem>
-                            <SelectItem value="lower">更低</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="col-span-1 flex items-end">
-                        <Button
-                          type="button"
+                      <div className="col-span-1 flex items-center">
+                        <Button 
                           onClick={() => removeProcessStep(index)}
-                          variant="outline"
+                          variant="ghost" 
                           size="sm"
-                          className="text-red-600 border-red-200 hover:bg-red-50"
-                          disabled={processSteps.length === 1}
+                          className="text-red-500 hover:text-red-700"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -360,10 +196,13 @@ const NewReport = () => {
               </div>
               
               {/* AI生成流程图 */}
-              <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
-                <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                <p className="font-medium">AI生成的现状流程图</p>
-                <p className="text-sm">基于流程表内容生成的可视化流程图</p>
+              <div className="p-8 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500 bg-gray-50">
+                <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                <p className="font-medium text-lg mb-2">AI生成的现状流程图</p>
+                <p className="text-sm">基于上述流程表内容，AI将自动生成可视化的业务流程图</p>
+                <Button className="mt-4" variant="outline">
+                  生成流程图
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -377,50 +216,54 @@ const NewReport = () => {
               {/* 场景流程表 */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-medium text-gray-900">场景流程表</h4>
-                  <Button 
-                    type="button" 
-                    onClick={addScenarioStep}
-                    variant="outline" 
-                    size="sm"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    添加场景
+                  <h4 className="font-medium text-gray-900">解决后场景流程表</h4>
+                  <Button onClick={addScenarioStep} variant="outline" size="sm">
+                    <Plus className="w-4 h-4 mr-1" />
+                    添加步骤
                   </Button>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-12 gap-4 p-3 bg-gray-100 rounded font-medium text-sm">
+                    <div className="col-span-1">序号</div>
+                    <div className="col-span-3">场景步骤</div>
+                    <div className="col-span-7">步骤描述</div>
+                    <div className="col-span-1">操作</div>
+                  </div>
                   {scenarioSteps.map((step, index) => (
-                    <div key={index} className="grid grid-cols-12 gap-4 p-4 border rounded bg-gray-50">
-                      <div className="col-span-1">
-                        <Label className="text-sm font-medium text-gray-700">序号</Label>
-                        <div className="mt-1 text-sm text-gray-600">{step.sequence}</div>
+                    <div key={index} className="grid grid-cols-12 gap-4 p-3 border rounded">
+                      <div className="col-span-1 flex items-center">
+                        <span className="text-sm font-medium">{step.sequence}</span>
                       </div>
-                      <div className="col-span-4">
-                        <Label className="text-sm font-medium text-gray-700">场景步骤</Label>
-                        <Input
+                      <div className="col-span-3">
+                        <Input 
                           value={step.step}
-                          onChange={(e) => updateScenarioStep(index, 'step', e.target.value)}
-                          placeholder="请输入场景步骤"
-                          className="mt-1"
+                          onChange={(e) => {
+                            const newSteps = [...scenarioSteps];
+                            newSteps[index].step = e.target.value;
+                            setScenarioSteps(newSteps);
+                          }}
+                          placeholder="场景名称"
+                          className="text-sm"
                         />
                       </div>
-                      <div className="col-span-6">
-                        <Label className="text-sm font-medium text-gray-700">场景描述</Label>
-                        <Input
+                      <div className="col-span-7">
+                        <Textarea 
                           value={step.description}
-                          onChange={(e) => updateScenarioStep(index, 'description', e.target.value)}
-                          placeholder="请输入场景描述"
-                          className="mt-1"
+                          onChange={(e) => {
+                            const newSteps = [...scenarioSteps];
+                            newSteps[index].description = e.target.value;
+                            setScenarioSteps(newSteps);
+                          }}
+                          placeholder="详细描述解决后的场景流程"
+                          className="text-sm min-h-[60px]"
                         />
                       </div>
-                      <div className="col-span-1 flex items-end">
-                        <Button
-                          type="button"
+                      <div className="col-span-1 flex items-center">
+                        <Button 
                           onClick={() => removeScenarioStep(index)}
-                          variant="outline"
+                          variant="ghost" 
                           size="sm"
-                          className="text-red-600 border-red-200 hover:bg-red-50"
-                          disabled={scenarioSteps.length === 1}
+                          className="text-red-500 hover:text-red-700"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -431,10 +274,13 @@ const NewReport = () => {
               </div>
               
               {/* AI生成场景流程图 */}
-              <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
-                <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                <p className="font-medium">AI生成的场景流程图</p>
+              <div className="p-8 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500 bg-gray-50">
+                <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                <p className="font-medium text-lg mb-2">AI生成的场景流程图</p>
                 <p className="text-sm">基于场景流程表生成的解决后场景流程图</p>
+                <Button className="mt-4" variant="outline">
+                  生成流程图
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -445,48 +291,15 @@ const NewReport = () => {
               <CardTitle>五、解决方案描述</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="space-y-4">
-                {solutions.map((solution, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor={`solutionTitle-${index}`} className="text-sm font-medium text-gray-700">
-                        解决方案 {index + 1}
-                      </Label>
-                      <Button
-                        type="button"
-                        onClick={() => removeSolution(index)}
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 border-red-200 hover:bg-red-50"
-                        disabled={solutions.length === 1}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    <Input
-                      id={`solutionTitle-${index}`}
-                      placeholder="请输入解决方案标题"
-                      value={solution.title}
-                      onChange={(e) => updateSolution(index, 'title', e.target.value)}
-                      className="mt-1"
-                    />
-                    <Textarea
-                      placeholder="请填写解决方案描述..."
-                      value={solution.content}
-                      onChange={(e) => updateSolution(index, 'content', e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                ))}
-                <Button 
-                  type="button" 
-                  onClick={addSolution}
-                  variant="outline" 
-                  size="sm"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  添加解决方案
-                </Button>
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-base font-medium text-gray-900 mb-3 block">方案1：智能化设计工作台</Label>
+                  <Textarea placeholder="详细描述第一个解决方案..." className="min-h-[120px]" />
+                </div>
+                <div>
+                  <Label className="text-base font-medium text-gray-900 mb-3 block">方案2：AI辅助设计系统</Label>
+                  <Textarea placeholder="详细描述第二个解决方案..." className="min-h-[120px]" />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -497,92 +310,27 @@ const NewReport = () => {
               <CardTitle>六、资源稀缺以及投入计划阐述</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="space-y-4">
-                {resourcePlans.map((plan, index) => (
-                  <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded bg-gray-50">
-                    <div>
-                      <Label htmlFor={`resourceType-${index}`} className="text-sm font-medium text-gray-700">
-                        资源类型
-                      </Label>
-                      <Input
-                        id={`resourceType-${index}`}
-                        placeholder="请输入资源类型"
-                        value={plan.type}
-                        onChange={(e) => updateResourcePlan(index, 'type', e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor={`currentResources-${index}`} className="text-sm font-medium text-gray-700">
-                        现有资源情况
-                      </Label>
-                      <Input
-                        id={`currentResources-${index}`}
-                        placeholder="请输入现有资源情况"
-                        value={plan.current}
-                        onChange={(e) => updateResourcePlan(index, 'current', e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor={`resourceGap-${index}`} className="text-sm font-medium text-gray-700">
-                        需求缺口
-                      </Label>
-                      <Input
-                        id={`resourceGap-${index}`}
-                        placeholder="请输入需求缺口"
-                        value={plan.gap}
-                        onChange={(e) => updateResourcePlan(index, 'gap', e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor={`investmentPlan-${index}`} className="text-sm font-medium text-gray-700">
-                        投入计划
-                      </Label>
-                      <Input
-                        id={`investmentPlan-${index}`}
-                        placeholder="请输入投入计划"
-                        value={plan.plan}
-                        onChange={(e) => updateResourcePlan(index, 'plan', e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div className="col-span-4 flex justify-end">
-                      <Button
-                        type="button"
-                        onClick={() => removeResourcePlan(index)}
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 border-red-200 hover:bg-red-50"
-                        disabled={resourcePlans.length === 1}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-                <Button 
-                  type="button" 
-                  onClick={addResourcePlan}
-                  variant="outline" 
-                  size="sm"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  添加资源计划
-                </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label className="text-base font-medium text-gray-900 mb-3 block">人力资源计划</Label>
+                  <Textarea placeholder="描述所需的人力资源，包括角色、技能要求、工时等..." className="min-h-[120px]" />
+                </div>
+                <div>
+                  <Label className="text-base font-medium text-gray-900 mb-3 block">技术资源计划</Label>
+                  <Textarea placeholder="描述所需的技术资源，包括开发环境、工具、平台等..." className="min-h-[120px]" />
+                </div>
+                <div>
+                  <Label className="text-base font-medium text-gray-900 mb-3 block">预算投入计划</Label>
+                  <Textarea placeholder="描述项目预算分配和投入计划..." className="min-h-[120px]" />
+                </div>
+                <div>
+                  <Label className="text-base font-medium text-gray-900 mb-3 block">时间资源计划</Label>
+                  <Textarea placeholder="描述项目时间安排和里程碑计划..." className="min-h-[120px]" />
+                </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* 提交按钮 */}
-          <div className="flex justify-center">
-            <Button type="submit" className="bg-gradient-to-r from-blue-600 to-indigo-600">
-              <Save className="w-4 h-4 mr-2" />
-              提交
-            </Button>
-          </div>
-        </form>
+        </div>
       </main>
     </div>
   );

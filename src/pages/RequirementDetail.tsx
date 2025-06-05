@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, History, Save, X, TrendingUp } from "lucide-react";
+import { ArrowLeft, Edit, History, Save, X, TrendingUp, DollarSign, Target, Clock } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import TopNavigation from '@/components/TopNavigation';
 import { Textarea } from "@/components/ui/textarea";
@@ -17,61 +17,79 @@ const RequirementDetail = () => {
   // 模拟完整需求数据
   const requirement = {
     id: 1,
-    title: "用户管理系统需求",
-    background: "随着业务发展，需要构建完整的用户管理体系，包括用户注册、登录、权限管理等功能。当前系统缺乏统一的用户管理机制，存在安全隐患和管理效率问题。",
+    title: "电商投放图生产流程优化系统",
+    background: "随着电商业务快速发展，我们需要大量的投放图片内容。目前设计师手动制作投放图，存在效率低下、质量不一致、重复工作多等问题。急需建立智能化的投放图生产流程，提升设计效率和质量标准化。",
     currentAnalysis: {
-      completed: "已完成基础用户注册功能，实现了基本的用户信息录入和存储",
-      uncompleted: "权限管理、用户分组、角色管理等功能尚未实现",
-      painPoints: "现有系统权限控制粒度不够细，用户管理分散，缺乏统一的权限控制机制"
+      completed: "已建立基础的设计素材库，有专门的设计团队负责投放图制作，建立了基本的品牌规范和设计标准",
+      uncompleted: "缺乏智能化设计工具，素材管理不够系统化，设计流程标准化程度低，质量控制主要依赖人工审核",
+      painPoints: "设计师需要大量时间进行重复性工作，素材查找困难，不同设计师产出质量差异较大，无法快速响应营销活动需求"
     },
     processSteps: [
-      { sequence: 1, step: "需求调研", description: "与业务方沟通确认需求", aiEfficiency: "higher" },
-      { sequence: 2, step: "系统设计", description: "设计用户管理架构", aiEfficiency: "lower" },
-      { sequence: 3, step: "开发实施", description: "编码实现各功能模块", aiEfficiency: "higher" }
+      { sequence: 1, step: "接收投放需求", description: "市场部门提出电商投放图制作需求，包含产品信息、投放平台、目标人群等" },
+      { sequence: 2, step: "素材收集", description: "设计师手动收集产品图片、品牌素材、文案内容等设计元素" },
+      { sequence: 3, step: "设计制作", description: "使用Photoshop等工具进行投放图设计，包括构图、配色、文字排版等" },
+      { sequence: 4, step: "内容审核", description: "设计总监对设计稿进行审核，检查品牌规范、视觉效果等" },
+      { sequence: 5, step: "修改完善", description: "根据审核意见进行设计调整和优化" },
+      { sequence: 6, step: "最终交付", description: "输出不同尺寸规格的投放图，交付给市场部门使用" }
     ],
     scenarioSteps: [
-      {
-        sequence: 1,
-        step: "用户注册",
-        description: "新用户注册流程"
-      },
-      {
-        sequence: 2,
-        step: "权限分配",
-        description: "用户权限管理"
-      }
+      { sequence: 1, step: "智能需求分析", description: "AI系统自动分析投放需求，提取关键信息和设计要求" },
+      { sequence: 2, step: "自动素材匹配", description: "从素材库中智能匹配合适的产品图、背景、装饰元素" },
+      { sequence: 3, step: "AI辅助设计", description: "基于品牌规范和最佳实践，AI生成多个设计方案供选择" },
+      { sequence: 4, step: "快速预览调整", description: "设计师可实时预览效果，通过简单操作进行样式调整" },
+      { sequence: 5, step: "一键批量输出", description: "自动生成各平台所需的不同尺寸规格，确保质量一致性" }
     ],
     solutions: [
       {
-        title: "方案1：基于RBAC的权限管理",
-        content: "采用基于角色的访问控制模型，实现灵活的权限管理。包括用户-角色-权限三层架构，支持动态权限配置。"
+        title: "方案1：智能化设计工作台",
+        content: "构建集成AI能力的设计工作台，包含智能素材推荐、自动排版、样式生成等功能。通过机器学习算法分析历史优秀设计案例，为设计师提供智能化的设计建议和自动化工具。"
       },
       {
-        title: "方案2：微服务架构用户中心",
-        content: "构建独立的用户管理微服务，提供统一的用户认证和授权服务，支持多应用集成。"
+        title: "方案2：模板化批量生产系统",
+        content: "建立标准化的设计模板库和自动化批量生产流程。通过模板配置和参数化设计，实现快速批量生成不同产品的投放图，大幅提升生产效率。"
       }
     ],
     resourcePlans: [
       {
         type: "人力资源",
-        current: "2名开发人员",
-        gap: "需要1名高级开发",
-        plan: "招聘或内部调配"
+        current: "3名UI设计师，1名设计总监",
+        gap: "需要1名AI算法工程师，1名前端开发",
+        plan: "内部培养结合外部招聘"
       },
       {
         type: "技术资源",
-        current: "基础开发环境",
-        gap: "缺少测试环境",
-        plan: "采购测试服务器"
+        current: "Adobe设计软件，基础云服务器",
+        gap: "AI训练平台，图像处理服务器集群",
+        plan: "采购云端AI服务和高性能计算资源"
+      },
+      {
+        type: "数据资源",
+        current: "部分历史设计作品，基础素材库",
+        gap: "大量标注训练数据，完整素材分类体系",
+        plan: "数据收集整理和专业标注服务"
       }
     ],
-    version: "v1.2",
+    // 新增成本概览数据
+    costOverview: {
+      totalBudget: 450000,
+      spentAmount: 180000,
+      remainingBudget: 270000,
+      costByPhase: [
+        { phase: "需求调研", budgetted: 50000, actual: 45000, status: "completed" },
+        { phase: "方案设计", budgetted: 80000, actual: 75000, status: "completed" },
+        { phase: "开发实施", budgetted: 200000, actual: 60000, status: "in-progress" },
+        { phase: "测试上线", budgetted: 70000, actual: 0, status: "pending" },
+        { phase: "运维支持", budgetted: 50000, actual: 0, status: "pending" }
+      ]
+    },
+    version: "v1.3",
     createDate: "2024-06-01",
-    lastModified: "2024-06-15",
+    lastModified: "2024-06-20",
     author: "张三"
   };
 
   const versions = [
+    { version: "v1.3", date: "2024-06-20", author: "张三", changes: "增加成本概览和资源规划细节" },
     { version: "v1.2", date: "2024-06-15", author: "张三", changes: "更新解决方案描述" },
     { version: "v1.1", date: "2024-06-10", author: "张三", changes: "完善资源计划" },
     { version: "v1.0", date: "2024-06-01", author: "张三", changes: "初始版本" }
@@ -85,6 +103,15 @@ const RequirementDetail = () => {
   const handleCancelEdit = () => {
     setIsEditing(false);
     setAssetLoss('');
+  };
+
+  const getPhaseStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed': return 'text-green-600 bg-green-50';
+      case 'in-progress': return 'text-blue-600 bg-blue-50';
+      case 'pending': return 'text-gray-600 bg-gray-50';
+      default: return 'text-gray-600 bg-gray-50';
+    }
   };
 
   return (
@@ -134,6 +161,63 @@ const RequirementDetail = () => {
             )}
           </div>
         </div>
+
+        {/* 成本概览 */}
+        <Card className="mb-8 border-0 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
+            <CardTitle className="flex items-center">
+              <DollarSign className="w-5 h-5 mr-2" />
+              任务成本概览
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            {/* 总体成本统计 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <Target className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-blue-600">¥{requirement.costOverview.totalBudget.toLocaleString()}</div>
+                <div className="text-sm text-gray-600">总预算</div>
+              </div>
+              <div className="text-center p-4 bg-orange-50 rounded-lg">
+                <Clock className="w-8 h-8 text-orange-500 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-orange-600">¥{requirement.costOverview.spentAmount.toLocaleString()}</div>
+                <div className="text-sm text-gray-600">已花费</div>
+              </div>
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <DollarSign className="w-8 h-8 text-green-500 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-green-600">¥{requirement.costOverview.remainingBudget.toLocaleString()}</div>
+                <div className="text-sm text-gray-600">剩余预算</div>
+              </div>
+            </div>
+
+            {/* 分阶段成本详情 */}
+            <div>
+              <h4 className="font-medium text-gray-900 mb-4">分阶段成本明细</h4>
+              <div className="space-y-3">
+                {requirement.costOverview.costByPhase.map((phase, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                    <div className="flex items-center space-x-4">
+                      <span className="font-medium text-gray-900">{phase.phase}</span>
+                      <span className={`px-2 py-1 rounded text-xs ${getPhaseStatusColor(phase.status)}`}>
+                        {phase.status === 'completed' ? '已完成' : 
+                         phase.status === 'in-progress' ? '进行中' : '待开始'}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-6 text-sm">
+                      <span className="text-gray-600">预算: ¥{phase.budgetted.toLocaleString()}</span>
+                      <span className="text-gray-900 font-medium">实际: ¥{phase.actual.toLocaleString()}</span>
+                      <span className={`font-medium ${
+                        phase.actual > phase.budgetted ? 'text-red-600' : 'text-green-600'
+                      }`}>
+                        {phase.actual > phase.budgetted ? '超支' : '正常'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* 版本历史侧边栏 */}
         {showVersionHistory && (
@@ -241,20 +325,13 @@ const RequirementDetail = () => {
             <CardContent className="p-6">
               {/* 流程表 */}
               <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-4">调研流程表</h4>
+                <h4 className="font-medium text-gray-900 mb-4">现状业务流程表</h4>
                 <div className="space-y-2">
                   {requirement.processSteps.map((step, index) => (
                     <div key={index} className="grid grid-cols-5 gap-4 p-3 border rounded bg-gray-50">
                       <div className="text-sm font-medium">{step.sequence}</div>
                       <div className="text-sm">{step.step}</div>
-                      <div className="text-sm col-span-2">{step.description}</div>
-                      <div className="text-sm">
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          step.aiEfficiency === 'higher' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
-                        }`}>
-                          {step.aiEfficiency === 'higher' ? 'AI效能更高' : 'AI效能较低'}
-                        </span>
-                      </div>
+                      <div className="text-sm col-span-3">{step.description}</div>
                     </div>
                   ))}
                 </div>
@@ -277,7 +354,7 @@ const RequirementDetail = () => {
             <CardContent className="p-6">
               {/* 场景流程表 */}
               <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-4">场景流程表</h4>
+                <h4 className="font-medium text-gray-900 mb-4">解决后场景流程表</h4>
                 <div className="space-y-4">
                   {requirement.scenarioSteps.map((step, index) => (
                     <div key={index} className="p-4 border rounded bg-gray-50">
