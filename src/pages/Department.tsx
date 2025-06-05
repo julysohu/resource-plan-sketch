@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Users, Clock, CheckCircle, Circle, ArrowRight, Sparkles } from "lucide-react";
+import { Plus, Users, Clock, CheckCircle, Circle, ArrowRight, Sparkles, Eye, Edit2 } from "lucide-react";
 import TopNavigation from '@/components/TopNavigation';
+import { useToast } from "@/hooks/use-toast";
 
 interface Task {
   id: string;
@@ -23,7 +24,16 @@ interface Task {
   children?: Task[];
 }
 
+interface AISuggestedTask {
+  title: string;
+  description: string;
+  estimatedDays: number;
+  assignee: string;
+  priority: '高' | '中' | '低';
+}
+
 const Department = () => {
+  const { toast } = useToast();
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
@@ -69,8 +79,10 @@ const Department = () => {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAICreateOpen, setIsAICreateOpen] = useState(false);
+  const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [aiInput, setAiInput] = useState('');
-  const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
+  const [aiSuggestions, setAiSuggestions] = useState<AISuggestedTask[]>([]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -82,25 +94,63 @@ const Department = () => {
   };
 
   const handleAIAnalyze = () => {
-    // 模拟AI分析
-    const suggestions = [
+    const suggestions: AISuggestedTask[] = [
       {
         title: '市场调研',
         description: '分析目标市场和竞品情况',
-        estimatedDays: 3
+        estimatedDays: 3,
+        assignee: '张三',
+        priority: '高'
       },
       {
         title: '用户访谈',
         description: '深度访谈目标用户，了解需求痛点',
-        estimatedDays: 5
+        estimatedDays: 5,
+        assignee: '李四',
+        priority: '高'
       },
       {
         title: '数据整理分析',
         description: '整理访谈数据，形成调研报告',
-        estimatedDays: 2
+        estimatedDays: 2,
+        assignee: '王五',
+        priority: '中'
       }
     ];
     setAiSuggestions(suggestions);
+  };
+
+  const updateAISuggestion = (index: number, field: keyof AISuggestedTask, value: any) => {
+    const newSuggestions = [...aiSuggestions];
+    newSuggestions[index] = { ...newSuggestions[index], [field]: value };
+    setAiSuggestions(newSuggestions);
+  };
+
+  const createAITasks = () => {
+    const newTasks = aiSuggestions.map((suggestion, index) => ({
+      id: Date.now().toString() + index,
+      title: suggestion.title,
+      description: suggestion.description,
+      initiator: '当前用户',
+      assignee: suggestion.assignee,
+      status: '待开始' as const,
+      deadline: new Date(Date.now() + suggestion.estimatedDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    }));
+
+    setTasks([...tasks, ...newTasks]);
+    setIsAICreateOpen(false);
+    setAiSuggestions([]);
+    setAiInput('');
+    
+    toast({
+      title: "成功",
+      description: `已创建 ${newTasks.length} 个任务`,
+    });
+  };
+
+  const openTaskDetail = (task: Task) => {
+    setSelectedTask(task);
+    setIsTaskDetailOpen(true);
   };
 
   const TaskCard = ({ task, level = 0 }: { task: Task; level?: number }) => (
@@ -132,6 +182,14 @@ const Department = () => {
             </div>
             
             <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => openTaskDetail(task)}
+              >
+                <Eye className="w-4 h-4 mr-1" />
+                查看详情
+              </Button>
               <Button variant="outline" size="sm">拆分子任务</Button>
               <Button variant="outline" size="sm">转交</Button>
             </div>
@@ -164,7 +222,7 @@ const Department = () => {
                   AI批量创建
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
+              <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>AI智能任务创建</DialogTitle>
                 </DialogHeader>
@@ -186,18 +244,74 @@ const Department = () => {
                   </Button>
                   
                   {aiSuggestions.length > 0 && (
-                    <div className="space-y-3">
-                      <h4 className="font-medium">AI建议的任务清单：</h4>
+                    <div className="space-y-4">
+                      <h4 className="font-medium">AI建议的任务清单（可编辑）：</h4>
                       {aiSuggestions.map((suggestion, index) => (
-                        <div key={index} className="border rounded-lg p-3 bg-purple-50">
-                          <div className="flex items-center justify-between">
-                            <h5 className="font-medium">{suggestion.title}</h5>
-                            <span className="text-sm text-gray-500">预计{suggestion.estimatedDays}天</span>
+                        <div key={index} className="border rounded-lg p-4 bg-purple-50 space-y-3">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label>任务标题</Label>
+                              <Input
+                                value={suggestion.title}
+                                onChange={(e) => updateAISuggestion(index, 'title', e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <Label>承接人</Label>
+                              <Select
+                                value={suggestion.assignee}
+                                onValueChange={(value) => updateAISuggestion(index, 'assignee', value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="张三">张三</SelectItem>
+                                  <SelectItem value="李四">李四</SelectItem>
+                                  <SelectItem value="王五">王五</SelectItem>
+                                  <SelectItem value="赵六">赵六</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
-                          <p className="text-sm text-gray-600 mt-1">{suggestion.description}</p>
+                          <div>
+                            <Label>任务描述</Label>
+                            <Textarea
+                              value={suggestion.description}
+                              onChange={(e) => updateAISuggestion(index, 'description', e.target.value)}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label>预计天数</Label>
+                              <Input
+                                type="number"
+                                value={suggestion.estimatedDays}
+                                onChange={(e) => updateAISuggestion(index, 'estimatedDays', parseInt(e.target.value))}
+                              />
+                            </div>
+                            <div>
+                              <Label>优先级</Label>
+                              <Select
+                                value={suggestion.priority}
+                                onValueChange={(value) => updateAISuggestion(index, 'priority', value as '高' | '中' | '低')}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="高">高</SelectItem>
+                                  <SelectItem value="中">中</SelectItem>
+                                  <SelectItem value="低">低</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
                         </div>
                       ))}
-                      <Button className="w-full mt-4">确认创建所有任务</Button>
+                      <Button onClick={createAITasks} className="w-full mt-4">
+                        确认创建所有任务
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -298,6 +412,57 @@ const Department = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* 任务详情弹框 */}
+        <Dialog open={isTaskDetailOpen} onOpenChange={setIsTaskDetailOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>任务详情</DialogTitle>
+            </DialogHeader>
+            {selectedTask && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium text-lg">{selectedTask.title}</h3>
+                  <Badge className={getStatusColor(selectedTask.status)}>{selectedTask.status}</Badge>
+                </div>
+                <div>
+                  <Label>任务描述</Label>
+                  <p className="text-gray-600 mt-1">{selectedTask.description}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>发起人</Label>
+                    <p className="text-gray-900 mt-1">{selectedTask.initiator}</p>
+                  </div>
+                  <div>
+                    <Label>承接人</Label>
+                    <p className="text-gray-900 mt-1">{selectedTask.assignee}</p>
+                  </div>
+                </div>
+                <div>
+                  <Label>截止时间</Label>
+                  <p className="text-gray-900 mt-1">{selectedTask.deadline}</p>
+                </div>
+                {selectedTask.children && selectedTask.children.length > 0 && (
+                  <div>
+                    <Label>子任务</Label>
+                    <div className="mt-2 space-y-2">
+                      {selectedTask.children.map(child => (
+                        <div key={child.id} className="p-3 border rounded bg-gray-50">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">{child.title}</span>
+                            <Badge className={getStatusColor(child.status)}>{child.status}</Badge>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">{child.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

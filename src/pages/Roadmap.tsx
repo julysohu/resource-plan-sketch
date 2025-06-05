@@ -1,281 +1,323 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, DollarSign, Calendar, Target, CheckCircle, Clock, Zap, Users, Code, Rocket } from "lucide-react";
+import { ArrowLeft, Calendar, DollarSign, Target, Milestone, MapPin, Clock, Image } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import TopNavigation from '@/components/TopNavigation';
 
-interface RoadmapItem {
+interface MilestoneData {
   id: string;
-  time: string;
-  milestone: string;
+  name: string;
+  date: string;
   description: string;
-  totalCost: number;
-  costDetails: { name: string; amount: number }[];
-  status: 'completed' | 'current' | 'upcoming';
-  icon: any;
+  status: 'completed' | 'in-progress' | 'pending';
+  costs: Array<{
+    name: string;
+    amount: number;
+  }>;
   image?: string;
-  achievements?: string[];
 }
 
 const Roadmap = () => {
   const { id } = useParams();
-  const [animateItems, setAnimateItems] = useState(false);
-  
-  useEffect(() => {
-    setTimeout(() => setAnimateItems(true), 300);
-  }, []);
+  const [selectedMilestone, setSelectedMilestone] = useState<MilestoneData | null>(null);
+  const [isCostDetailOpen, setIsCostDetailOpen] = useState(false);
 
-  const requirement = {
+  // 模拟项目信息
+  const project = {
     id: parseInt(id || '1'),
-    title: id === '1' ? '电商投放图生产流程优化' : id === '2' ? '智能设计师工作台开发' : '用户体验分析系统'
+    title: id === '1' ? '用户管理系统需求' : id === '2' ? '订单处理流程优化' : '数据报表系统',
+    description: id === '1' ? '构建完整的用户注册、登录、权限管理系统' : 
+                 id === '2' ? '优化订单处理流程，提升处理效率' : 
+                 '开发业务数据统计与报表展示功能'
   };
 
-  const [roadmapItems] = useState<RoadmapItem[]>([
+  const milestones: MilestoneData[] = [
     {
       id: '1',
-      time: '2024-06-01',
-      milestone: '需求调研完成',
-      description: '深入调研电商投放图生产现状，识别痛点与优化机会',
-      totalCost: 28000,
-      costDetails: [
-        { name: '用户调研与访谈', amount: 15000 },
-        { name: '竞品分析报告', amount: 8000 },
-        { name: '业务流程梳理', amount: 5000 }
-      ],
+      name: '需求分析完成',
+      date: '2024-05-15',
+      description: '完成用户需求调研与分析，明确功能范围和技术架构方案。深入了解用户痛点，制定详细的解决方案。',
       status: 'completed',
-      icon: Users,
-      achievements: ['完成30+设计师深度访谈', '识别5个核心痛点', '建立完整业务流程图']
+      costs: [
+        { name: '需求分析师工资', amount: 8000 },
+        { name: '调研费用', amount: 2000 }
+      ],
+      image: '/api/placeholder/300/200'
     },
     {
       id: '2',
-      time: '2024-06-15',
-      milestone: '方案设计确认',
-      description: '完成智能化设计方案设计，包括AI辅助工具与自动化流程',
-      totalCost: 45000,
-      costDetails: [
-        { name: '产品方案设计', amount: 25000 },
-        { name: '技术架构设计', amount: 12000 },
-        { name: 'UI/UX设计稿', amount: 8000 }
+      name: '系统架构设计',
+      date: '2024-06-01',
+      description: '设计系统整体架构，包括数据库设计、API接口设计和前端组件规划。确保系统的可扩展性和维护性。',
+      status: 'completed',
+      costs: [
+        { name: '架构师工资', amount: 12000 },
+        { name: '设计工具费', amount: 1000 }
       ],
-      status: 'current',
-      icon: Zap,
-      achievements: ['设计智能化工作流', '完成核心功能原型', 'AI算法方案确认']
+      image: '/api/placeholder/300/200'
     },
     {
       id: '3',
-      time: '2024-07-10',
-      milestone: '核心功能开发',
-      description: '开发AI辅助设计工具、模板库管理、批量处理等核心功能',
-      totalCost: 120000,
-      costDetails: [
-        { name: '前端开发工时', amount: 50000 },
-        { name: '后端开发工时', amount: 45000 },
-        { name: 'AI模型训练', amount: 25000 }
+      name: '核心功能开发',
+      date: '2024-06-15',
+      description: '开发用户注册、登录、权限管理等核心功能模块。采用模块化开发方式，确保代码质量和可测试性。',
+      status: 'in-progress',
+      costs: [
+        { name: '前端开发工资', amount: 15000 },
+        { name: '后端开发工资', amount: 18000 },
+        { name: '开发环境费用', amount: 3000 }
       ],
-      status: 'upcoming',
-      icon: Code,
-      achievements: ['AI设计助手上线', '智能模板推荐', '批量图片处理']
+      image: '/api/placeholder/300/200'
     },
     {
       id: '4',
-      time: '2024-07-25',
-      milestone: '系统测试上线',
-      description: '完成系统全面测试，正式上线投入使用，培训设计师团队',
-      totalCost: 35000,
-      costDetails: [
-        { name: '系统测试验证', amount: 15000 },
-        { name: '用户培训服务', amount: 12000 },
-        { name: '上线部署支持', amount: 8000 }
+      name: '系统测试',
+      date: '2024-06-25',
+      description: '进行全面的系统测试，包括单元测试、集成测试和用户验收测试。确保系统稳定性和用户体验。',
+      status: 'pending',
+      costs: [
+        { name: '测试工程师工资', amount: 8000 },
+        { name: '测试工具费', amount: 2000 }
       ],
-      status: 'upcoming',
-      icon: Rocket,
-      achievements: ['100%功能测试通过', '设计师培训完成', '生产效率提升60%']
+      image: '/api/placeholder/300/200'
+    },
+    {
+      id: '5',
+      name: '系统部署上线',
+      date: '2024-07-05',
+      description: '完成系统部署配置，进行生产环境优化，正式上线运营。提供完整的部署文档和运维手册。',
+      status: 'pending',
+      costs: [
+        { name: '运维工程师工资', amount: 6000 },
+        { name: '服务器费用', amount: 5000 },
+        { name: '域名SSL费用', amount: 500 }
+      ],
+      image: '/api/placeholder/300/200'
     }
-  ]);
+  ];
 
-  const totalProjectCost = roadmapItems.reduce((sum, item) => sum + item.totalCost, 0);
-  const completedCost = roadmapItems.filter(item => item.status === 'completed').reduce((sum, item) => sum + item.totalCost, 0);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-500 border-green-600';
+      case 'in-progress':
+        return 'bg-blue-500 border-blue-600';
+      case 'pending':
+        return 'bg-gray-400 border-gray-500';
+      default:
+        return 'bg-gray-400 border-gray-500';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return '已完成';
+      case 'in-progress':
+        return '进行中';
+      case 'pending':
+        return '待开始';
+      default:
+        return '待开始';
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return {
+      month: month.toString().padStart(2, '0'),
+      day: day.toString().padStart(2, '0'),
+      year: year.toString(),
+      monthName: ['一月', '二月', '三月', '四月', '五月', '六月', 
+                  '七月', '八月', '九月', '十月', '十一月', '十二月'][month - 1]
+    };
+  };
+
+  const openCostDetail = (milestone: MilestoneData) => {
+    setSelectedMilestone(milestone);
+    setIsCostDetailOpen(true);
+  };
+
+  const totalCost = milestones.reduce((sum, milestone) => 
+    sum + milestone.costs.reduce((milestoneSum, cost) => milestoneSum + cost.amount, 0), 0
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
       <TopNavigation />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header with enhanced design */}
-        <div className="relative mb-12">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-3xl"></div>
-          <div className="relative p-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-6">
-                <Link to={`/development/${id}`}>
-                  <Button variant="ghost" size="sm" className="hover:bg-white/50">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    返回开发详情
-                  </Button>
-                </Link>
-                <div>
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    {requirement.title}
-                  </h1>
-                  <p className="text-xl text-gray-600 mt-2">项目路线图 · 总投入 ¥{totalProjectCost.toLocaleString()}</p>
-                </div>
-              </div>
-              
-              {/* Progress circle */}
-              <div className="relative w-24 h-24">
-                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="none" className="text-gray-200" />
-                  <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="none" className="text-blue-500"
-                    strokeDasharray={`${(completedCost / totalProjectCost) * 251.2} 251.2`} strokeLinecap="round" />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-blue-600">
-                    {Math.round((completedCost / totalProjectCost) * 100)}%
-                  </span>
-                </div>
-              </div>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-4">
+            <Link to={`/development/${id}`}>
+              <Button variant="ghost" size="sm" className="hover:bg-purple-100">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                返回开发详情
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                {project.title} - 项目路线图
+              </h1>
+              <p className="text-gray-600 mt-2">{project.description}</p>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Timeline */}
-        <div className="relative">
-          {/* Timeline line */}
-          <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 via-purple-500 to-indigo-500 rounded-full opacity-30"></div>
-          
-          <div className="space-y-12">
-            {roadmapItems.map((item, index) => {
-              const Icon = item.icon;
-              const isEven = index % 2 === 0;
-              
-              return (
-                <div 
-                  key={item.id} 
-                  className={`relative flex items-center ${animateItems ? 'animate-fade-in' : 'opacity-0'}`}
-                  style={{ animationDelay: `${index * 200}ms` }}
-                >
-                  {/* Timeline dot */}
-                  <div className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all duration-500 hover:scale-110 ${
-                    item.status === 'completed' ? 'bg-gradient-to-r from-green-500 to-emerald-500' :
-                    item.status === 'current' ? 'bg-gradient-to-r from-blue-500 to-indigo-500 animate-pulse' :
-                    'bg-gradient-to-r from-gray-400 to-gray-500'
-                  }`}>
-                    {item.status === 'completed' ? 
-                      <CheckCircle className="w-8 h-8 text-white" /> :
-                      <Icon className="w-8 h-8 text-white" />
-                    }
-                  </div>
-                  
-                  {/* Content card */}
-                  <div className={`ml-8 flex-1 ${isEven ? 'mr-0' : 'mr-8'}`}>
-                    <Card className={`relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 ${
-                      item.status === 'current' ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
-                    }`}>
-                      {item.status === 'current' && (
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-                      )}
-                      
-                      <CardContent className="p-8">
-                        <div className="flex items-start justify-between mb-6">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-3">
-                              <h3 className="text-2xl font-bold text-gray-900">{item.milestone}</h3>
-                              {item.status === 'current' && (
-                                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                                  进行中
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center text-gray-600 mb-4">
-                              <Calendar className="w-5 h-5 mr-2" />
-                              {item.time}
-                            </div>
-                            <p className="text-gray-700 text-lg leading-relaxed mb-6">{item.description}</p>
-                            
-                            {/* Achievements */}
-                            {item.achievements && (
-                              <div className="mb-6">
-                                <h4 className="font-semibold text-gray-900 mb-3">关键成果：</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                  {item.achievements.map((achievement, idx) => (
-                                    <div key={idx} className="flex items-center space-x-2 bg-green-50 rounded-lg p-3">
-                                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                      <span className="text-sm text-gray-700">{achievement}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center space-x-4 ml-6">
-                            <div className="text-right">
-                              <div className="text-sm text-gray-500 mb-1">投入成本</div>
-                              <div className="text-2xl font-bold text-gray-400">¥{item.totalCost.toLocaleString()}</div>
-                            </div>
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="outline" size="sm" className="hover:bg-gray-50">
-                                  <DollarSign className="w-4 h-4 mr-1" />
-                                  明细
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="sm:max-w-[500px]">
-                                <DialogHeader>
-                                  <DialogTitle className="text-xl">{item.milestone} - 成本明细</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4 mt-6">
-                                  {item.costDetails.map((cost, costIndex) => (
-                                    <div key={costIndex} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                                      <span className="text-gray-700 font-medium">{cost.name}</span>
-                                      <span className="font-bold text-gray-900">¥{cost.amount.toLocaleString()}</span>
-                                    </div>
-                                  ))}
-                                  <div className="border-t pt-4 flex justify-between items-center font-bold text-lg">
-                                    <span>总计</span>
-                                    <span className="text-blue-600">¥{item.totalCost.toLocaleString()}</span>
-                                  </div>
-                                </div>
-                              </DialogContent>
-                            </Dialog>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        {/* 项目概览卡片 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+            <CardContent className="p-6 text-center">
+              <Target className="w-10 h-10 mx-auto mb-3 text-purple-100" />
+              <div className="text-3xl font-bold">{milestones.length}</div>
+              <div className="text-purple-100">里程碑总数</div>
+            </CardContent>
+          </Card>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+            <CardContent className="p-6 text-center">
+              <Clock className="w-10 h-10 mx-auto mb-3 text-blue-100" />
+              <div className="text-3xl font-bold">{milestones.filter(m => m.status === 'completed').length}</div>
+              <div className="text-blue-100">已完成</div>
+            </CardContent>
+          </Card>
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-green-500 to-green-600 text-white">
+            <CardContent className="p-6 text-center">
+              <DollarSign className="w-10 h-10 mx-auto mb-3 text-green-100" />
+              <div className="text-3xl font-bold">¥{(totalCost / 10000).toFixed(1)}万</div>
+              <div className="text-green-100">总预算</div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Enhanced Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-          <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 bg-gradient-to-br from-blue-50 to-indigo-50">
-            <CardContent className="p-8 text-center">
-              <Target className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-              <div className="text-3xl font-bold text-blue-600 mb-2">{roadmapItems.length}</div>
-              <div className="text-gray-600 font-medium">关键里程碑</div>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 bg-gradient-to-br from-green-50 to-emerald-50">
-            <CardContent className="p-8 text-center">
-              <DollarSign className="w-12 h-12 text-green-500 mx-auto mb-4" />
-              <div className="text-3xl font-bold text-green-600 mb-2">¥{totalProjectCost.toLocaleString()}</div>
-              <div className="text-gray-600 font-medium">项目总投入</div>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 bg-gradient-to-br from-purple-50 to-pink-50">
-            <CardContent className="p-8 text-center">
-              <Clock className="w-12 h-12 text-purple-500 mx-auto mb-4" />
-              <div className="text-3xl font-bold text-purple-600 mb-2">55</div>
-              <div className="text-gray-600 font-medium">预计工作日</div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* 时间线 */}
+        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-t-lg">
+            <CardTitle className="text-2xl flex items-center">
+              <MapPin className="w-6 h-6 mr-3" />
+              项目时间线
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-8">
+            <div className="relative">
+              {/* 时间线主线 */}
+              <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-400 to-indigo-400 rounded-full"></div>
+              
+              <div className="space-y-12">
+                {milestones.map((milestone, index) => {
+                  const dateInfo = formatDate(milestone.date);
+                  const totalMilestoneCost = milestone.costs.reduce((sum, cost) => sum + cost.amount, 0);
+                  
+                  return (
+                    <div key={milestone.id} className="relative flex items-start group">
+                      {/* 时间标签 */}
+                      <div className="flex flex-col items-center mr-8">
+                        <div className={`w-16 h-16 rounded-full flex flex-col items-center justify-center text-white shadow-lg transform transition-all duration-300 group-hover:scale-110 ${getStatusColor(milestone.status)}`}>
+                          <div className="text-lg font-bold">{dateInfo.day}</div>
+                          <div className="text-xs">{dateInfo.month}月</div>
+                        </div>
+                        <div className="mt-2 text-center">
+                          <div className="text-sm text-gray-500">{dateInfo.year}</div>
+                          <div className="text-xs text-gray-400">{dateInfo.monthName}</div>
+                        </div>
+                      </div>
+
+                      {/* 里程碑内容卡片 */}
+                      <div className="flex-1 bg-white rounded-xl shadow-lg border border-gray-100 p-6 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h3 className="text-xl font-bold text-gray-900">{milestone.name}</h3>
+                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                milestone.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {getStatusText(milestone.status)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 里程碑描述和图片 */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                          <div className="lg:col-span-2">
+                            <p className="text-gray-600 leading-relaxed mb-4">{milestone.description}</p>
+                            
+                            {/* 成本信息 */}
+                            <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
+                              <div className="flex items-center space-x-2">
+                                <DollarSign className="w-5 h-5 text-gray-500" />
+                                <span className="text-sm text-gray-600">预算成本</span>
+                              </div>
+                              <div className="flex items-center space-x-3">
+                                <span className="text-lg font-bold text-gray-900">
+                                  ¥{totalMilestoneCost.toLocaleString()}
+                                </span>
+                                <Button
+                                  onClick={() => openCostDetail(milestone)}
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs hover:bg-purple-50 hover:border-purple-200"
+                                >
+                                  查看明细
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* 里程碑图片 */}
+                          <div className="lg:col-span-1">
+                            <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+                              <Image className="w-12 h-12 text-gray-400" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 成本明细弹框 */}
+        <Dialog open={isCostDetailOpen} onOpenChange={setIsCostDetailOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center space-x-2">
+                <DollarSign className="w-5 h-5" />
+                <span>成本明细 - {selectedMilestone?.name}</span>
+              </DialogTitle>
+            </DialogHeader>
+            {selectedMilestone && (
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="text-sm text-gray-600 mb-2">总成本</div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    ¥{selectedMilestone.costs.reduce((sum, cost) => sum + cost.amount, 0).toLocaleString()}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <h4 className="font-medium text-gray-900">成本明细</h4>
+                  {selectedMilestone.costs.map((cost, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="text-gray-700">{cost.name}</span>
+                      <span className="font-medium text-gray-900">¥{cost.amount.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

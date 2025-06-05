@@ -1,10 +1,11 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Plus, Trash2, CheckCircle, Clock, AlertCircle, DollarSign, Target, Trophy, Map } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ArrowLeft, Plus, Trash2, CheckCircle, Clock, AlertCircle, DollarSign, Target, Trophy, Map, Eye, ChevronRight } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import TopNavigation from '@/components/TopNavigation';
@@ -12,9 +13,12 @@ import TopNavigation from '@/components/TopNavigation';
 interface DevelopmentTask {
   id: string;
   title: string;
+  description: string;
   assignee: string;
   deadline: string;
   status: 'pending' | 'in-progress' | 'completed';
+  parentId?: string;
+  children?: DevelopmentTask[];
 }
 
 interface CostItem {
@@ -51,10 +55,54 @@ const DevelopmentDetail = () => {
   };
 
   const [tasks, setTasks] = useState<DevelopmentTask[]>([
-    { id: '1', title: '用户注册功能开发', assignee: '张三', deadline: '2024-06-15', status: 'completed' },
-    { id: '2', title: '用户登录功能开发', assignee: '李四', deadline: '2024-06-20', status: 'in-progress' },
-    { id: '3', title: '权限管理模块', assignee: '王五', deadline: '2024-06-25', status: 'pending' },
+    { 
+      id: '1', 
+      title: '用户注册功能开发', 
+      description: '开发完整的用户注册流程，包括邮箱验证、密码强度检查等功能',
+      assignee: '张三', 
+      deadline: '2024-06-15', 
+      status: 'completed',
+      children: [
+        {
+          id: '1-1',
+          title: '注册页面UI设计',
+          description: '设计用户注册页面的界面布局',
+          assignee: '王五',
+          deadline: '2024-06-10',
+          status: 'completed',
+          parentId: '1'
+        },
+        {
+          id: '1-2',
+          title: '邮箱验证功能',
+          description: '实现邮箱验证逻辑',
+          assignee: '张三',
+          deadline: '2024-06-12',
+          status: 'completed',
+          parentId: '1'
+        }
+      ]
+    },
+    { 
+      id: '2', 
+      title: '用户登录功能开发', 
+      description: '开发用户登录验证、记住密码、找回密码等功能',
+      assignee: '李四', 
+      deadline: '2024-06-20', 
+      status: 'in-progress' 
+    },
+    { 
+      id: '3', 
+      title: '权限管理模块', 
+      description: '设计和实现基于角色的权限管理系统',
+      assignee: '王五', 
+      deadline: '2024-06-25', 
+      status: 'pending' 
+    },
   ]);
+
+  const [selectedTask, setSelectedTask] = useState<DevelopmentTask | null>(null);
+  const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
 
   const [costs, setCosts] = useState<CostItem[]>([
     { id: '1', name: '开发人员工资', amount: 50000 },
@@ -73,6 +121,7 @@ const DevelopmentDetail = () => {
 
   const [newTask, setNewTask] = useState({
     title: '',
+    description: '',
     assignee: '',
     deadline: '',
     status: 'pending' as const
@@ -117,7 +166,7 @@ const DevelopmentDetail = () => {
     };
 
     setTasks([...tasks, task]);
-    setNewTask({ title: '', assignee: '', deadline: '', status: 'pending' });
+    setNewTask({ title: '', description: '', assignee: '', deadline: '', status: 'pending' });
     
     toast({
       title: "成功",
@@ -133,6 +182,11 @@ const DevelopmentDetail = () => {
     setTasks(tasks.map(task => 
       task.id === taskId ? { ...task, status } : task
     ));
+  };
+
+  const openTaskDetail = (task: DevelopmentTask) => {
+    setSelectedTask(task);
+    setIsTaskDetailOpen(true);
   };
 
   // Cost handlers
@@ -324,42 +378,56 @@ const DevelopmentDetail = () => {
             <CardTitle className="text-xl">添加开发任务</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div className="grid grid-cols-1 gap-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">任务标题</Label>
+                  <Input
+                    id="title"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                    placeholder="请输入任务标题"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="assignee" className="text-sm font-medium text-gray-700">负责人</Label>
+                  <Input
+                    id="assignee"
+                    value={newTask.assignee}
+                    onChange={(e) => setNewTask({ ...newTask, assignee: e.target.value })}
+                    placeholder="请输入负责人"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
               <div>
-                <Label htmlFor="title" className="text-sm font-medium text-gray-700">任务标题</Label>
-                <Input
-                  id="title"
-                  value={newTask.title}
-                  onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                  placeholder="请输入任务标题"
+                <Label htmlFor="description" className="text-sm font-medium text-gray-700">任务描述</Label>
+                <Textarea
+                  id="description"
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                  placeholder="请输入任务描述"
                   className="mt-1"
                 />
               </div>
-              <div>
-                <Label htmlFor="assignee" className="text-sm font-medium text-gray-700">负责人</Label>
-                <Input
-                  id="assignee"
-                  value={newTask.assignee}
-                  onChange={(e) => setNewTask({ ...newTask, assignee: e.target.value })}
-                  placeholder="请输入负责人"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="deadline" className="text-sm font-medium text-gray-700">截止时间</Label>
-                <Input
-                  id="deadline"
-                  type="date"
-                  value={newTask.deadline}
-                  onChange={(e) => setNewTask({ ...newTask, deadline: e.target.value })}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Button onClick={addTask} className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800">
-                  <Plus className="w-4 h-4 mr-2" />
-                  添加任务
-                </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="deadline" className="text-sm font-medium text-gray-700">截止时间</Label>
+                  <Input
+                    id="deadline"
+                    type="date"
+                    value={newTask.deadline}
+                    onChange={(e) => setNewTask({ ...newTask, deadline: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <Button onClick={addTask} className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800">
+                    <Plus className="w-4 h-4 mr-2" />
+                    添加任务
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -386,13 +454,31 @@ const DevelopmentDetail = () => {
                         {getStatusIcon(task.status)}
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-900">{task.title}</h4>
+                          <p className="text-sm text-gray-600 mt-1">{task.description}</p>
                           <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600">
                             <span>负责人: {task.assignee}</span>
                             <span>截止: {task.deadline}</span>
+                            {task.children && task.children.length > 0 && (
+                              <span className="flex items-center">
+                                <ChevronRight className="w-4 h-4 mr-1" />
+                                {task.children.length} 个子任务
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
+                        <Button
+                          onClick={() => openTaskDetail(task)}
+                          variant="outline"
+                          size="sm"
+                          className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          查看详情
+                        </Button>
+                        <Button variant="outline" size="sm">拆分子任务</Button>
+                        <Button variant="outline" size="sm">转交</Button>
                         <select
                           value={task.status}
                           onChange={(e) => updateTaskStatus(task.id, e.target.value as DevelopmentTask['status'])}
@@ -421,6 +507,67 @@ const DevelopmentDetail = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* 任务详情弹框 */}
+        <Dialog open={isTaskDetailOpen} onOpenChange={setIsTaskDetailOpen}>
+          <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>任务详情</DialogTitle>
+            </DialogHeader>
+            {selectedTask && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium text-lg">{selectedTask.title}</h3>
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-2 ${getStatusColor(selectedTask.status)}`}>
+                    {getStatusText(selectedTask.status)}
+                  </span>
+                </div>
+                <div>
+                  <Label>任务描述</Label>
+                  <p className="text-gray-600 mt-1">{selectedTask.description}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>负责人</Label>
+                    <p className="text-gray-900 mt-1">{selectedTask.assignee}</p>
+                  </div>
+                  <div>
+                    <Label>截止时间</Label>
+                    <p className="text-gray-900 mt-1">{selectedTask.deadline}</p>
+                  </div>
+                </div>
+                {selectedTask.children && selectedTask.children.length > 0 && (
+                  <div>
+                    <Label>子任务列表</Label>
+                    <div className="mt-2 space-y-2">
+                      {selectedTask.children.map(child => (
+                        <div key={child.id} className="p-3 border rounded bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
+                             onClick={() => openTaskDetail(child)}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              {getStatusIcon(child.status)}
+                              <span className="font-medium">{child.title}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(child.status)}`}>
+                                {getStatusText(child.status)}
+                              </span>
+                              <ChevronRight className="w-4 h-4 text-gray-400" />
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">{child.description}</p>
+                          <div className="text-xs text-gray-500 mt-1">
+                            负责人: {child.assignee} | 截止: {child.deadline}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* 成本管理 */}
         <Card className="border-0 shadow-lg">
