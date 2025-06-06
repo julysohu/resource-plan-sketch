@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Users, Building, User, PlusCircle, BarChart3, Target, Zap, TrendingUp, Calendar, CheckCircle } from "lucide-react";
+import { FileText, Users, Building, User, PlusCircle, BarChart3, Target, Zap, TrendingUp, Calendar, CheckCircle, Kanban } from "lucide-react";
 import { Link } from "react-router-dom";
 import TopNavigation from '@/components/TopNavigation';
 
@@ -96,7 +95,7 @@ const Index = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <Link to="/new-report">
                 <Button className="w-full h-20 flex flex-col items-center justify-center space-y-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700">
                   <PlusCircle className="w-6 h-6" />
@@ -107,6 +106,12 @@ const Index = () => {
                 <Button className="w-full h-20 flex flex-col items-center justify-center space-y-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
                   <Users className="w-6 h-6" />
                   <span>开发管理</span>
+                </Button>
+              </Link>
+              <Link to="/project-board">
+                <Button className="w-full h-20 flex flex-col items-center justify-center space-y-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700">
+                  <Kanban className="w-6 h-6" />
+                  <span>专项项目看板</span>
                 </Button>
               </Link>
               <Link to="/department">
